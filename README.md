@@ -1,10 +1,10 @@
 # Ficha del proyecto "Alvexia".
 
-**Nombre**  : "Alvexia"
-**Expansión** : "New World"
-**Generos** : "MMORPG - ARPG - Post. Apocaliptico"
-**Graficas** : "2D pixelart 16bit"
-**Publico Objetivo** : +10 años
+- **Nombre**  : "Alvexia"
+- **Expansión** : "New World"
+- **Generos** : "MMORPG - ARPG - Post. Apocaliptico"
+- **Graficas** : "2D pixelart 16bit"
+- **Publico Objetivo** : +10 años
 
 
 ## Desarrollo-Historia :

@@ -1,8 +1,6 @@
-app.Script("config.js");
-app.Script(PATH.lib.ajaxsend);
-app.Script(PATH.lib.socket);
-app.Script(PATH.lib.dom);
-app.Script(PATH.script("global.js"))
+app.Script("./config.js");
+app.Script(config.PATH.script+"/global.js")
+app.Script(config.PATH.lib+"/ajax-send.min.js");
 
 function OnStart() {
   

@@ -1,5 +1,5 @@
 //importación de librerías
-app.Script(PATH.lib.dom);
+app.Script(config.PATH.lib+"/dom.min.js");
 
 //funciones complementarias
 mx = {};
@@ -8,6 +8,7 @@ mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
 mx.open = url => window.open(url);
 mx.Alert = txt=>app.Alert(txt);
+
 //evitar interacciones del usuario
 mx.CreateBlock = function(){
     var _block = dom.create("div");

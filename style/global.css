@@ -1,0 +1,17 @@
+:root {
+  -webkit-user-select: none;
+  user-select: none;
+  --color-background-main: #000000;
+  --color-background-box: #eeeeee;
+  --color-background-box-inactive: #aaaaaa;
+  --color-background-main-inactive: #bbbbbb;
+  --color-background-font: #222222;
+  --size-font-chat: 13px;
+}
+
+body {
+   margin: 0;
+   background: var(--color-background-main);
+   width: 100vw;
+   height: 100vh;
+}

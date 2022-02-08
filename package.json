@@ -1,0 +1,19 @@
+{
+  "name": "alvexia-app",
+  "version": "0.0.1",
+  "description": "Juego MMORPG",
+  "main": "Alvexia.js",
+  "scripts": {
+    "test": "droidscript ide"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RodnyE/alvexia-app.git"
+  },
+  "author": "Rodny Estrada",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RodnyE/alvexia-app/issues"
+  },
+  "homepage": "https://github.com/RodnyE/alvexia-app#readme"
+}

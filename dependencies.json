@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "dom": "dom.min.js",
+    "joystick": "joy.min.js",
+    "drawerbuild": "drawerbuild-0.4.2.min.js",
+    "stylespam": "stylespam-2.1.7.min.js",
+    
+    "ajaxsend": "ajax_send-1.7.1.min.js",
+    "socket": "socket.io-3.0.5.min.js"
+  }
+}

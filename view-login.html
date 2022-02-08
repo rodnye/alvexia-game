@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!--Lib-->
+    <script src='file:///android_asset/app.js'></script>
+    
+    <!--source-->
+    <link rel="stylesheet" href="./style/global.css"></link>
+    <script src="./script/global.js"></script>
+    
+    <script src="./script/login.js"></script>
+    <link rel='stylesheet' href='./style/login.css'></link>
+</head>
+
+<body onload="app.Start()">
+
+	<div class=container>
+	    <!--TABS BUTTONS-->
+	    <div class=tab-container>
+	        <div id=open-login-btn>Iniciar Sesión</div>
+	        <div id=open-register-btn>Registrarse</div>
+	    </div>
+	    
+	    <!--TAB LOGIN CONTENT-->
+	    <div class=login-view id=login-view>
+	        <input class=form id=login-input-user type="text">
+	        <input class=form id=login-input-pass type="password">
+	        <button class=form id=login-submit></button>
+	    </div>
+	    
+	    <!---TAB REGISTER CONTENT-->
+	    <div class=login-view id=register-view>
+	        <h2>Crear Cuenta</h2>
+	        <form>
+	            <table>
+	                <tr>
+	                    <td><input class=form id=register-input-user type=text required></td>
+	                    <td><input class=form id=register-input-pass type=password required></td>
+	                </tr>
+	                <tr>
+	                    <td><input class=form id=register-input-email type=email required></td>
+	                    <td><input class=form id=register-input-rpass type=password required></td>
+	                </tr>
+	            </table>
+	            <button class=form id=register-submit></button>
+	        </form>
+	    </div>
+	</div>
+	
+</body>
+</html>

@@ -123,7 +123,7 @@ TAB.login.submit = ({
     {
       username: _user,
       password: _pass,
-      app_token: config.APP_TOKEN;
+      app_token: config.APP_TOKEN
     },
     function(_data, _status) {
       app.HideProgress();

@@ -1,4 +1,4 @@
-app.Script("./config.js");
+
 app.Script(config.PATH.script+"/global.js")
 app.Script(config.PATH.lib+"/ajax-send.min.js");
 
@@ -98,7 +98,7 @@ TAB.register.submit = ({
     email: _email,
     password: _pass,
     rpassword: _rpass,
-    token: config.APP_TOKEN
+    app_token: config.APP_TOKEN
   },
    (_data, _status)=>{
       if (_status === 200) {
@@ -106,8 +106,8 @@ TAB.register.submit = ({
            mx.SaveText("login-user", _user);
            mx.SaveText("login-pass", _pass);
         }
-        mx.Alert(_data.message);
-      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nERROR: "+(_status?_status: "NOT_INTERNET"));
+        mx.Alert(_data.data);
+      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nHTTP ERROR: "+(_status?_status: "NOT_INTERNET"));
       mx.HideProgress();
     })
 }
@@ -117,41 +117,25 @@ TAB.login.submit = ({
   _user = aut_input_user.value,
   _pass = aut_input_pass.value
 })=>{
-  mx.ShowProgress()
+  mx.ShowProgress("Estableciendo conexión...")
   //http
   server.post(config.URL.auth,
     {
       username: _user,
       password: _pass,
-      token: config.APP_TOKEN
+      app_token: config.APP_TOKEN;
     },
     function(_data, _status) {
-      mx.HideProgress();
+      app.HideProgress();
       if (_status === 200) {
         if (_data.status) {
           mx.ShowProgress("Conectandose...");
           var auth_query = "token="+_data.message+"&username="+_user;
-
-          //conectarse a socket
-          socket = io.connect(config.URL.socket, {query: auth_query});
-          
-          socket.on("connect", function() {
-            //si se conecta
-            mx.HideProgress();
-            mx.debug("Conexión establecida");
-            app.SetData("auth-query", auth_query);
-            mx.SaveText("login-user", _user);
-            mx.SaveText("login-pass", _pass);
-            mx.open("./view-game.html");
-          });
-          socket.on("disconnect", function() {
-            mx.HideProgress();
-            mx.debug("Conexión cerrada");
-          })
-        } else {
-          mx.HideProgress();
-          mx.Alert(_data.message);
-        }
-      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nERROR: "+(_status?_status: "NOT_INTERNET"));
+          app.SetData("auth-query", auth_query);
+          mx.SaveText("login-user", _user);
+          mx.SaveText("login-pass", _pass);
+          mx.open("./view-game.html");
+        } else mx.Alert(_data.data)
+      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nHTTP ERROR: "+(_status?_status: "NOT_INTERNET"));
     })
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!--Lib-->
+    <script src='file:///android_asset/app.js'></script>
+    <script src="./Html/joy.min.js"></script>
+    <!--source-->
+    <link rel="stylesheet" href="./style/global.css"></link>
+    <script src="config.js"></script>
+    
+    <script src="./script/game.js"></script>
+    <link rel='stylesheet' href='./style/game.css'></link>
+</head>
+
+<body onload="app.Start()">
+  
+  <canvas id=game-view></canvas>
+	<div id=joystick></div>
+	
+	<div id=action-container>
+	   <div class=action-container-top>
+	     <div class=column-action-container>
+	       <!-- Botones verticales -->
+	       <button class="btn-action-items"></button>
+	       <button class="btn-action-items"></button>
+	       <button class="btn-action-items"></button>
+	     </div>
+	   </div>
+	   <div class=action-container-bottom>
+	     <div class=row-action-container>
+	        <!--Botones horizontales-->
+	        <button class="btn-action-items"></button>
+	        <button class="btn-action-items"></button>
+	        <button class="btn-action-items"></button>
+	     </div>
+	     <div class="btn-action-primary-container">
+	        <!-- BOTON PRINCIPAL -->
+	        <button id=btn-action-primary></button>
+	     </div>
+	   </div>
+	</div>
+	
+	
+</body>
+</html>

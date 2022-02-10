@@ -1,0 +1,60 @@
+/* CANVAS */
+#game-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  
+  width: 100vw;
+  height: 100vh;
+}
+
+/* CONTROLES */
+#joystick {
+  position: absolute;
+  bottom: 0;
+  left:0;
+  
+  width: 150px;
+  height: 150px;
+  margin-bottom: 5px;
+}
+
+#action-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* CONTROLES DE ACCIONES */
+div.action-container-bottom {
+  display: flex;
+}
+div.action-container-top {
+  display: flex;
+}
+div.column-action-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+div.row-action-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+#btn-action-primary {
+  background: #ff0000;
+  border-radius: 500px;
+  width: 80px;
+  height: 80px;
+}
+button.btn-action-items {
+  width: 60px;
+  height: 60px;
+  background: blue;
+}

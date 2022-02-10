@@ -5,7 +5,7 @@ config = {
       VERSION: "0.0.1",
 
       URL: {
-        server: "https://tulip-steel-mind.glitch.me",
+        server: "https://jewel-bottlenose-volleyball.glitch.me",
         //server: "https://alvexia-server-franky96lol.dcoder.run",
         socket: "",
         auth: "{{URL.server}}" + "/auth/login",

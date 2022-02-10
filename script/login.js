@@ -106,8 +106,8 @@ TAB.register.submit = ({
            mx.SaveText("login-user", _user);
            mx.SaveText("login-pass", _pass);
         }
-        mx.Alert(_data.data);
-      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nHTTP ERROR: "+(_status?_status: "NOT_INTERNET"));
+        mx.Alert(raw.parse(_data.data));
+      } else mx.Alert(raw.parse("HTTP_ERROR")+(_status?_status: "NOT_INTERNET"));
       mx.HideProgress();
     })
 }
@@ -129,13 +129,12 @@ TAB.login.submit = ({
       app.HideProgress();
       if (_status === 200) {
         if (_data.status) {
-          mx.ShowProgress("Conectandose...");
-          var auth_query = "token="+_data.message+"&username="+_user;
+          var auth_query = "token="+_data.token+"&username="+_user;
           app.SetData("auth-query", auth_query);
           mx.SaveText("login-user", _user);
           mx.SaveText("login-pass", _pass);
           mx.open("./view-game.html");
-        } else mx.Alert(_data.data)
-      } else mx.Alert("Upps! Hubo un error, no se pudo establecer la conexión :(\n\nHTTP ERROR: "+(_status?_status: "NOT_INTERNET"));
+        } else mx.Alert(raw.parse(_data.data))
+      } else mx.Alert(raw.parse("HTTP_ERROR")+(_status?_status: "NOT_INTERNET"));
     })
 }

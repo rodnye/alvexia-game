@@ -53,3 +53,36 @@ mx.LoadText = function(_param){
   var _data = app.LoadText(_param, "%%null");
   return _data!=="%%null"?_data:undefined;
 };
+
+//parseador de status del server
+var raw;
+class RawParser {
+  constructor(_type){
+    this.type = _type;
+    this.raw_list = [];
+  }
+  add(_data, _result){
+    this.raw_list.push({r:_data,s:_result})
+  }
+  parse(_data){
+    for(let i of this.raw_list) if(i.r === _data) return i.s;
+    return "PARSE ERROR, string not found: "+_data;
+  }
+};
+
+raw = new RawParser();
+raw.add("DATA_ERROR",        "La sintaxis de los parámetros enviados es incorrecta")
+raw.add("WRONG_USER",        "El usuario o la contraseña son incorrectos");
+raw.add("WRONG_EMAIL",       "El correo electrónico no es válido");
+raw.add("USERNAME_BAD_CHAR", "El nombre de usuario posee caracteres no válidos")
+raw.add("ACC_ERROR",         "Los datos de la cuenta tienen un error");
+raw.add("EMPTY_USER",        "El usuario no puede estar en blanco");
+raw.add("EMPTY_PASS",        "La contraseña no puede estar vacía");
+raw.add("EMPTY_EMAIL",       "El email no puede estar vacío");
+raw.add("EMAIL_USED",        "El email introducido ya se encuentra en uso");
+raw.add("PASS_MATH",         "Las contraseñas no coinciden");
+raw.add("PASS_LENGTH",       "La contraseña debe estar en el rango de 6 a 15 letras");
+raw.add("SUCCESS",           "Operación efectuada correctamente");
+raw.add("REGISTERED",        "Usted a sido registrado correctamente");
+//local
+raw.add("HTTP_ERROR",        "Upps! Hubo un error al conectarse al servidor :(\nHTTP ERROR: ")

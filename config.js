@@ -5,7 +5,8 @@ config = {
       VERSION: "0.0.1",
 
       URL: {
-        server: "https://alvexia-server-franky96lol.dcoder.run",
+        server: "https://tulip-steel-mind.glitch.me",
+        //server: "https://alvexia-server-franky96lol.dcoder.run",
         socket: "",
         auth: "{{URL.server}}" + "/auth/login",
         register: "{{URL.server}}" + "/auth/register",

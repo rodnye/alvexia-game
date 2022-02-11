@@ -6,8 +6,7 @@ config = {
 
       URL: {
         server: "https://jewel-bottlenose-volleyball.glitch.me",
-        //server: "https://alvexia-server-franky96lol.dcoder.run",
-        socket: "",
+        socket: "{{URL.server}}",
         auth: "{{URL.server}}" + "/auth/login",
         register: "{{URL.server}}" + "/auth/register",
         wake_up: "{{URL.server}}" + "/wakeup"
@@ -18,11 +17,6 @@ config = {
         lib: "./Html",
         script: "./script",
         data: "/sdcard/Android/data/"+"{{PACKAGE}}",
-      },
-      USER: {
-        token: null,
-        name: null,
-        password: null
       }
 }
 

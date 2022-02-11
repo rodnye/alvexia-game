@@ -77,17 +77,18 @@ class RawParser {
 raw = new RawParser();
 raw.add("DATA_ERROR",        "La sintaxis de los parámetros enviados es incorrecta")
 raw.add("WRONG_USER",        "El usuario o la contraseña son incorrectos");
-raw.add("WRONG_EMAIL",       "El correo electrónico no es válido");
+raw.add("WRONG_MAIL",       "El correo electrónico no es válido");
 raw.add("WRONG_APP_TOKEN",   "Estás usando una versión obsoleta de la aplicación, por favor actualice")
 raw.add("USERNAME_BAD_CHAR", "El nombre de usuario posee caracteres no válidos")
 raw.add("ACC_ERROR",         "Los datos de la cuenta tienen un error");
 raw.add("EMPTY_USER",        "El usuario no puede estar en blanco");
 raw.add("EMPTY_PASS",        "La contraseña no puede estar vacía");
-raw.add("EMPTY_EMAIL",       "El email no puede estar vacío");
+raw.add("EMPTY_MAIL",       "El email no puede estar vacío");
 raw.add("EMAIL_USED",        "El email introducido ya se encuentra en uso");
 raw.add("PASS_MATH",         "Las contraseñas no coinciden");
 raw.add("PASS_LENGTH",       "La contraseña debe estar en el rango de 8 a 15 letras");
 raw.add("SUCCESS",           "Operación efectuada correctamente");
 raw.add("REGISTERED",        "Usted a sido registrado correctamente");
 //local
-raw.add("HTTP_ERROR",        "Upps! Hubo un error al conectarse al servidor :(\nHTTP ERROR: ")
+raw.add("HTTP_ERROR",        "Upps! Hubo un error al conectarse al servidor :(\nHTTP ERROR: ");
+raw.add("CANVAS_ERROR",      "El motor gráfico de su dispositivo no es compatible con el juego.");

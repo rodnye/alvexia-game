@@ -2,7 +2,8 @@
 function OnStart(){
    //configuracionea
    app.SetOnShowKeyboard( OnKeyboard );
-   app.SetOrientation( "Landscape" )
+   app.SetOrientation( "Landscape" );
+   app.SetScreenMode("Game");
    
    //elementos
    parent = app.CreateLayout( "Linear", "FillXY" );

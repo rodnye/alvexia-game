@@ -69,9 +69,14 @@ engine.generate_frame = () => {
   engine.clear_frame();
   let world_img = world.img_data;
   
-  if (world_img.floor.ready) for(let y = 0; y < world.size[1]; y+=world_img.floor.height){
-    for(let x = 0; x < world.size[0]; x+=world_img.floor.width){
-      game.drawImage(world_img.floor, x+world.pos[0], y+world.pos[1], world_img.floor.width, world_img.floor.height)
+  let _y = player.pos[1]-screen.height/2;
+  
+  if (world_img.floor.ready) for(let y = _y; y < _y+screen.height*2; y+=world_img.floor.height){
+    
+    let _x = player.pos[0]-screen.width/2;
+    
+    for(let x = _x; x < _x+screen.width*2; x+=world_img.floor.width){
+      game.drawImage(world_img.floor, x+world.pos[0], y+world.pos[1], world_img.floor.width, world_img.floor.height);
     }
   }
   if (player.img.ready) game.drawImage(player.img, game_view.width/2-player.size[0]/2, game_view.height/2-player.size[1]/2, player.size[0], player.size[1]);
@@ -86,6 +91,7 @@ engine.generate_frame = () => {
 
 // BORRAR FRAME //
 engine.clear_frame = () => game.clearRect(0,0,game_view.width, game_view.height);
+
 // DEBUG CANVAS //
 engine.debug = txt=>{
   let ww = 10;

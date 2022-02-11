@@ -5,7 +5,6 @@ app.Script(config.PATH.script+"/engine.js");
 
 function OnStart() {
   // USER STATUS //
-  //app.SetScreenMode("Game");
   config.USER = {
     socket: {query: app.GetData("auth-query")},
     name: mx.LoadText("login-user"),
@@ -14,7 +13,7 @@ function OnStart() {
   }
   
   
-  game_view = dom.getId("game-view");
+  game_view = dom.get("#game-view");
   joy = new JoyStick("joystick", {}, engine.joystick);
 
   //comprobar si tiene soporte
@@ -32,8 +31,8 @@ function OnStart() {
 
 
 // CONEXION //
-function Connect(ss=true) {
-  if(ss)mx.ShowProgress();
+function Connect(ss=true) {if(ss) {
+  mx.ShowProgress();
   socket = io.connect(config.URL.socket, config.USER.socket);
 
   socket.on("connect", ()=>{
@@ -72,4 +71,4 @@ function Connect(ss=true) {
     player.pos[0] = d.pos.x;
     player.pos[1] = d.pos.y;
   })
-}
+}}

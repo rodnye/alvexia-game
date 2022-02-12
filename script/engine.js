@@ -16,7 +16,6 @@ engine.init = ()=> {
     mov_enable: true,
     mov: [0,0],
     size: [20, 20],
-    speed: 1,
     deg: 0,
     texture: "hero_basic",
     img: new Image(),

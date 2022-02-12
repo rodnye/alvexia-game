@@ -13,7 +13,6 @@ engine.init = ()=> {
   gx.player = {
     pos: [0, 0],
     mov_enable: true,
-    mov: [0, 0],
     size: [20, 20],
     speed: 1,
     deg: 0,
@@ -29,7 +28,7 @@ engine.init = ()=> {
   
   // WORLD //
   gx.world = {
-    size: [5000, 5000],
+    size: [0,0],
     pos: [0,0],
     bioma: "nature",
     textures: [],
@@ -40,22 +39,6 @@ engine.init = ()=> {
   var world = gx.world;
   engine.load_world();
   
-  // LOGICA //
-  mx.Animate(60, ()=>{
-    if (player.mov[0]) {
-      //si hay movimiento en x
-      player.pos[0] += player.mov[0];
-      world.pos[0] = -player.pos[0]
-    }
-    if (player.mov[1]) {
-      //si hay movimiento en y
-      player.pos[1] -= player.mov[1];
-      world.pos[1] = -player.pos[1]
-    }
-    //si no hay movimiento ni en x ni en y
-    //if (!player.mov[0] && !player.mov[1]) socket.emit("move_pj", {x:0,y:0})
-  }).start();
-  
   // MOSTRAR //
   mx.Animate("frame", engine.generate_frame).start();
   
@@ -64,13 +47,10 @@ engine.init = ()=> {
 // ACCIONES JOYSTICK //
 engine.joystick = d => {
     var player = gx.player;
-    
     if(player.mov_enable){
-      player.mov[0] = d.x/100*player.speed;
-      player.mov[1] = d.y/100*player.speed;
-      socket.emit("move_pj", {x:d.x, y:d.y});
-      //player.mov_enable = false;
-      //window.setTimeout(function(){player.mov_enable=true}, 100)
+      socket.emit("move_pj", Math.round(d.x)+"_"+Math.round(d.y));
+      player.mov_enable = false;
+      window.setTimeout(function(){player.mov_enable=true}, 100)
     }
 }
 
@@ -105,8 +85,8 @@ engine.generate_frame = () => {
   }*/
   if (world_img.floor.ready) game.drawImage(world_img.floor, world.pos[0], world.pos[1], world.size[0], world.size[1])
   if (player.img.ready) game.drawImage(player.img, game_view.width/2-player.size[0]/2, game_view.height/2-player.size[1]/2, player.size[0], player.size[1]);
-  for (let i in gx.pjs) if(px.pjs[i]!==undefined) {
-    let pj = px.pjs[i];
+  for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
+    let pj = gx.pjs[i];
     if(pj.img.ready) game.drawImage(
          pj.img, 
          pj.pos[0]-world.pos[0],
@@ -120,9 +100,7 @@ engine.generate_frame = () => {
     "player x: "+player.pos[0],
     "player y: "+player.pos[1],
     "world x: "+world.pos[0],
-    "world y: "+world.pos[1],
-    "movx:"+player.mov[0],
-    "movy:"+player.mov[1]
+    "world y: "+world.pos[1]
   ])
 }
 

@@ -67,10 +67,15 @@ engine.socket = (socket)=>{
   
   // MOVER //
   socket.on("move_pj", d=>{
-    let player = config.USER.name==d.username?gx.player:gx.pjs[d.username];
-    player.pos[0] = d.pos.x;
-    player.pos[1] = d.pos.y;
+    let is_user = config.USER.name==d.username;
+    let player = is_user?gx.player:gx.pjs[d.username];
+    player.pos = [d.pos.x, d.pos.y]
     player.deg = d.pos.angle;
+    
+    if(is_user) gx.world.pos = [
+      -d.pos.x, 
+      -d.pos.y
+    ];
   })
   
 }

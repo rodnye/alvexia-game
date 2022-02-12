@@ -8,6 +8,7 @@ app.Script(config.PATH.script+"/socket-engine.js");
 
 function OnStart() {
   mx.debug_init();
+  app.SetScreenMode("Game");
   
   // USER STATUS //
   config.USER = {

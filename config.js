@@ -13,6 +13,8 @@ config = {
       },
       PATH: {
         img: "./Img",
+        img_pjs: "{{PATH.img}}"+"/pjs",
+        img_world: "{{PATH.img}}"+"/world",
         sound: "./Snd",
         lib: "./Html",
         script: "./script",

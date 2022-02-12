@@ -58,6 +58,11 @@ mx.LoadText = function(_param){
   return _data!=="%%null"?_data:undefined;
 };
 
+// parseador de imagenes
+mx.BImg = function(d){
+  return d+".png";
+}
+
 //parseador de status del server
 var raw;
 class RawParser {

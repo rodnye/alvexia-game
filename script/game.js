@@ -1,7 +1,10 @@
 app.Script(config.PATH.lib+"/socket-io.min.js");
 app.Script(config.PATH.lib+"/joy.min.js");
 app.Script(config.PATH.script+"/global.js");
+var engine = {};
 app.Script(config.PATH.script+"/engine.js");
+app.Script(config.PATH.script+"/socket-engine.js");
+
 
 function OnStart() {
   // USER STATUS //
@@ -9,7 +12,8 @@ function OnStart() {
     socket: {query: app.GetData("auth-query")},
     name: mx.LoadText("login-user"),
     pass: mx.LoadText("login-pass"),
-    is_connect: false
+    is_connect: false,
+    socket_enabled: false,
   }
   
   
@@ -25,14 +29,15 @@ function OnStart() {
   game_view.height = screen.height;
 
   engine.init();
-  Connect(false);
+  Connect();
 }
 
 
 
 // CONEXION //
-function Connect(ss=true) {if(ss) {
+function Connect() {
   mx.ShowProgress();
+  config.USER.socket_enabled = true;
   socket = io.connect(config.URL.socket, config.USER.socket);
 
   socket.on("connect", ()=>{
@@ -50,25 +55,6 @@ function Connect(ss=true) {if(ss) {
     config.USER.is_connect = true;
   });
   
-  // LOGICA ONLINE //
-  socket.on("load_map", d=>{
-    /* map = {
-        name : WORDNAME,
-        pos : {
-            x : POS_X,
-            y : POS_Y
-        },
-        size : {
-            x : WORD_WIDTH,
-            y : WORD_HEIGHT
-        },
-        biome : "nature",
-        terrain : {},
-        objects : {},
-        npcs : {},
-        pjs : {}
-    } */
-    player.pos[0] = d.pos.x;
-    player.pos[1] = d.pos.y;
-  })
-}}
+  engine.socket(socket);
+  
+}

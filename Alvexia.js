@@ -8,7 +8,7 @@ function OnStart(){
    //elementos
    parent = app.CreateLayout( "Linear", "FillXY" );
    viewApp = app.CreateWebView( 1, 1 );
-   viewApp.LoadUrl( "view-game.html" );
+   viewApp.LoadUrl( "view-login.html" );
    
    //agregar
    parent.AddChild( viewApp );

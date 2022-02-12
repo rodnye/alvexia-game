@@ -129,7 +129,7 @@ TAB.login.submit = ({
       app.HideProgress();
       if (_status === 200) {
         if (_data.status) {
-          var auth_query = "token="+_data.token+"&username="+_user;
+          var auth_query = "token="+_data.data+"&username="+_user;
           app.SetData("auth-query", auth_query);
           mx.SaveText("login-user", _user);
           mx.SaveText("login-pass", _pass);

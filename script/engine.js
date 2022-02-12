@@ -4,6 +4,7 @@ var gx = {
   player: null,
   world: null,
   pjs: {},
+  _emitps: 30
 };
 
 
@@ -11,13 +12,16 @@ var gx = {
 engine.init = ()=> {
   // PLAYER //
   gx.player = {
-    pos: [0, 0],
+    pos: [0,0],
     mov_enable: true,
+    mov: [0,0],
     size: [20, 20],
     speed: 1,
     deg: 0,
     texture: "hero_basic",
-    img: new Image()
+    img: new Image(),
+    
+    _emit_joy_enable: true,
   };
   
   var player = gx.player;
@@ -41,17 +45,21 @@ engine.init = ()=> {
   
   // MOSTRAR //
   mx.Animate("frame", engine.generate_frame).start();
+  mx.Animate("frame", ()=>{
+    if(config.USER.is_connect && player._emit_joy_enable && player.mov_enable){
+        socket.emit("move_pj", Math.round(player.mov[0])+"_"+Math.round(player.mov[1]));
+        player.mov_enable = false;
+        window.setTimeout(()=>{player.mov_enable=true}, 1000/gx._emitps)
+      }
+  }).start()
   
 }
 
 // ACCIONES JOYSTICK //
 engine.joystick = d => {
     var player = gx.player;
-    if(player.mov_enable){
-      socket.emit("move_pj", Math.round(d.x)+"_"+Math.round(d.y));
-      player.mov_enable = false;
-      window.setTimeout(function(){player.mov_enable=true}, 100)
-    }
+    player._emit_joy_enable = d.x!=0 && d.y!=0;
+    player.mov = [d.x, d.y];
 }
 
 // GENERAR WORLD //

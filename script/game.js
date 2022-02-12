@@ -7,6 +7,8 @@ app.Script(config.PATH.script+"/socket-engine.js");
 
 
 function OnStart() {
+  mx.debug_init();
+  
   // USER STATUS //
   config.USER = {
     socket: {query: app.GetData("auth-query")},

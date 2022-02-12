@@ -1,5 +1,6 @@
 //importación de librerías
 app.Script(config.PATH.lib+"/dom.min.js");
+app.Script(config.PATH.lib+"/debug-zone.min.js");
 
 //funciones complementarias
 mx = {};
@@ -8,6 +9,7 @@ mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
 mx.open = url => window.open(url);
 mx.Alert = txt=>app.Alert(txt);
+mx.debug_init = ()=>new Debugger("console").enable();
 
 //evitar interacciones del usuario
 mx.CreateBlock = function(){

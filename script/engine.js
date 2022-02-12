@@ -60,7 +60,7 @@ engine.init = ()=> {
 engine.joystick = d => {
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
-    player.mov = [d.x, d.y];
+    player.mov = [d.x, -d.y];
 }
 
 // GENERAR WORLD //

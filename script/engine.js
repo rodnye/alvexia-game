@@ -4,7 +4,7 @@ var gx = {
   player: null,
   world: null,
   pjs: {},
-  _emitps: 30
+  _emitps: 30,
 };
 
 
@@ -15,12 +15,12 @@ engine.init = ()=> {
     pos: [0,0],
     mov_enable: true,
     mov: [0,0],
-    size: [20, 20],
+    size: [40, 50],
     deg: 0,
     texture: "hero_basic",
     img: new Image(),
     
-    _emit_joy_enable: true,
+    _emit_joy_enable: false,
   };
   
   var player = gx.player;
@@ -44,9 +44,11 @@ engine.init = ()=> {
   
   // MOSTRAR //
   mx.Animate("frame", engine.generate_frame).start();
+  
   mx.Animate("frame", ()=>{
     if(config.USER.is_connect && player._emit_joy_enable && player.mov_enable){
-        socket.emit("move_pj", Math.round(player.mov[0])+"_"+Math.round(player.mov[1]));
+        socket.emit("move_pj", {x:player.mov[0], y:player.mov[1]});
+        total_emit++;
         player.mov_enable = false;
         window.setTimeout(()=>{player.mov_enable=true}, 1000/gx._emitps)
       }
@@ -67,8 +69,8 @@ engine.load_world = () => {
   let img_floor = new Image();
       img_floor.onload = ()=>{img_floor.ready=true};
       img_floor.src = mx.BImg(path_world+"/base");
-      img_floor.width = 80;
-      img_floor.height = 80;
+      img_floor.width = 50;
+      img_floor.height = 50;
   
   gx.world.img_data.floor = img_floor;
 };
@@ -107,7 +109,8 @@ engine.generate_frame = () => {
     "player x: "+player.pos[0],
     "player y: "+player.pos[1],
     "world x: "+world.pos[0],
-    "world y: "+world.pos[1]
+    "world y: "+world.pos[1],
+    "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)"
   ])
 }
 

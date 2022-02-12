@@ -1,7 +1,9 @@
+total_emit = 0;
 engine.socket = (socket)=>{
   
   // LOAD MAP //
   socket.on("load_map", d=>{
+    console.log("ws load_map ><")
     /* map = {
         name : WORDNAME,
         pos : {
@@ -29,6 +31,7 @@ engine.socket = (socket)=>{
   
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
   socket.on("new_pj", d=>{
+    console.log("ws new_pj>> username:"+d.username)
     /*username,
       pjstats: {
         nickname,
@@ -61,6 +64,7 @@ engine.socket = (socket)=>{
   
   // ACTUALIZAR PLAYER EN LA CAMARA //
   socket.on("del_pj", d=>{
+    console.log("ws del_pj>> "+d)
     try {delete gx.pjs[d]}
     catch(e){gx.pjs[d] = undefined}
   });
@@ -69,7 +73,7 @@ engine.socket = (socket)=>{
   socket.on("move_pj", d=>{
     let is_user = config.USER.name==d.username;
     let player = is_user?gx.player:gx.pjs[d.username];
-    player.pos = [d.pos.x, d.pos.y]
+    player.pos = [d.pos.x, d.pos.y];
     player.deg = d.pos.angle;
     
     if(is_user) gx.world.pos = [

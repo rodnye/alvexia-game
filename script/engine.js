@@ -17,7 +17,7 @@ engine.init = ()=> {
     mov: [0,0],
     size: [40, 50],
     deg: 0,
-    texture: "hero_basic",
+    texture: "hero_",
     img: new Image(),
     
     _mov_enable: true,
@@ -25,10 +25,6 @@ engine.init = ()=> {
   };
   
   var player = gx.player;
-  
-  
-  player.img.onload = ()=>{player.img.ready=true}
-  player.img.src = mx.BImg(config.PATH.img_pjs+"/"+player.texture);
   
   // WORLD //
   gx.world = {

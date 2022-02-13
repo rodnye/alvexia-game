@@ -75,7 +75,6 @@ engine.socket = (socket)=> {
     delay_emit -= Date.now();
     delay_emit_count = -delay_emit/1000;
     delay_emit = Date.now();
-    dg("ws move_pj")
     if (is_user) gx.world.pos = [
       -d.pos.x,
       -d.pos.y

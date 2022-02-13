@@ -4,7 +4,7 @@ var gx = {
   player: null,
   world: null,
   pjs: {},
-  _emitps: 60,
+  _emitps: 120,
 };
 
 
@@ -43,7 +43,7 @@ engine.init = ()=> {
   mx.Animate("frame", engine.generate_frame).start();
   
   // LOGICA //
-  mx.Animate("frame", ()=>{
+  mx.Animate(60, ()=>{
     if(config.USER.is_connect){
       if(player._emit_joy_enable && player._mov_enable){
         //emitir al servidor
@@ -54,8 +54,8 @@ engine.init = ()=> {
       }
       
       //mover personaje localmente
-      player.pos[0] += player.mov[0];
-      player.pos[1] += player.mov[1];
+      player.pos[0] += player.mov[0]>player.speed?player.speed:player.mov[0];
+      player.pos[1] += player.mov[1]>player.speed?player.speed:player.mov[1];
       gx.world.pos = [-player.pos[0],-player.pos[1]];
       
     }

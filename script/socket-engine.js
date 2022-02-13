@@ -35,7 +35,7 @@ engine.socket = (socket)=> {
 
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
   socket.on("new_pj", d=> {
-    console.log("ws new_pj>> username:"+d.username)
+    //console.log("ws new_pj>> username:"+d.username)
     /*username,
       pjstats: {
         nickname,
@@ -85,14 +85,15 @@ engine.socket = (socket)=> {
 
 engine.world_add_player = d=> {
   let stats = d.pjstats;
-  let player = {
-    pos: [stats.pos.x, stats.pos.y],
-    deg: stats.pos.angle,
-    size: [stats.size.x, stats.size.y],
-    texture: stats.skin,
-    img: new Img()
-  };
-  player.img.src = mx.BImg(config.PATH.img_pjs+"/"+player.texture);
+  let is_user = config.USER.name==d.username;
+  if(!is_user) gx.pjs[d.username] = {};
+  let player = is_user?gx.player:gx.pjs[d.username];
+  player.pos = [stats.pos.x, stats.pos.y];
+  player.deg = stats.pos.angle;
+  player.size = [stats.size.x, stats.size.y];
+  player.texture = stats.skin;
+  
+  player.img = new Image();
   player.img.onload = ()=> {player.img.ready = true};
-  gx.pjs[d.username] = player;
+  player.img.src = mx.BImg(config.PATH.img_pjs+"/"+player.texture);//+player.texture);
 }

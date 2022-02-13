@@ -88,8 +88,8 @@ engine.generate_frame = () => {
     let pj = gx.pjs[i];
     if(pj.img.ready) game.drawImage(
          pj.img, 
-         pj.pos[0],
-         pj.pos[1],
+         pj.pos[0]+world.pos[0]+game_view.width/2,
+         pj.pos[1]+world.pos[1]+game_view.height/2,
          pj.size[0],
          pj.size[1]
     );

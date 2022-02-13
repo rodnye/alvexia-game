@@ -13,13 +13,14 @@ engine.init = ()=> {
   // PLAYER //
   gx.player = {
     pos: [0,0],
-    mov_enable: true,
+    speed: 0,
     mov: [0,0],
     size: [40, 50],
     deg: 0,
     texture: "hero_basic",
     img: new Image(),
     
+    _mov_enable: true,
     _emit_joy_enable: false,
   };
   
@@ -45,13 +46,23 @@ engine.init = ()=> {
   // MOSTRAR //
   mx.Animate("frame", engine.generate_frame).start();
   
+  // LOGICA //
   mx.Animate("frame", ()=>{
-    if(config.USER.is_connect && player._emit_joy_enable && player.mov_enable){
-        socket.emit("move_pj", {x:player.mov[0], y:player.mov[1]});
+    if(config.USER.is_connect){
+      if(player._emit_joy_enable && player._mov_enable){
+        //emitir al servidor
+        socket.emit("move_pj", {x:player.pos[0], y:player.pos[1]});
         total_emit++;
-        player.mov_enable = false;
-        window.setTimeout(()=>{player.mov_enable=true}, 1000/gx._emitps)
+        player._mov_enable = false;
+        window.setTimeout(()=>{player._mov_enable=true}, 1000/gx._emitps);
       }
+      
+      //mover personaje localmente
+      player.pos[0] += player.mov[0];
+      player.pos[1] += player.mov[1];
+      gx.world.pos = [-player.pos[0],-player.pos[1]];
+      
+    }
   }).start()
   
 }
@@ -60,7 +71,8 @@ engine.init = ()=> {
 engine.joystick = d => {
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
-    player.mov = [d.x, -d.y];
+    player.mov[0] = d.x/100*player.speed;
+    player.mov[1] = -d.y/100*player.speed;
 }
 
 // GENERAR WORLD //
@@ -88,8 +100,8 @@ engine.generate_frame = () => {
     let pj = gx.pjs[i];
     if(pj.img.ready) game.drawImage(
          pj.img, 
-         cvw(pj.pos[0]+world.pos[0])+game_view.width/2,
-         cvw(pj.pos[1]+world.pos[1])+game_view.height/2,
+         cvw(pj.pos[0] + world.pos[0] - pj.size[0]/2)+game_view.width/2,
+         cvw(pj.pos[1] + world.pos[1] - pj.size[1]/2)+game_view.height/2,
          cvw(pj.size[0]),
          cvw(pj.size[1])
     );
@@ -98,6 +110,8 @@ engine.generate_frame = () => {
   engine.debug([
     "player x: "+player.pos[0],
     "player y: "+player.pos[1],
+    "mov x: "+player.mov[0],
+    "mov y: "+player.mov[1],
     "world x: "+world.pos[0],
     "world y: "+world.pos[1],
     "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)",

@@ -82,16 +82,16 @@ engine.generate_frame = () => {
   let world = gx.world;
   let world_img = world.img_data;
   
-  if (world_img.floor.ready) game.drawImage(world_img.floor, world.pos[0]+game_view.width/2, world.pos[1]+game_view.height/2, world.size[0], world.size[1])
-  if (player.img.ready) game.drawImage(player.img, game_view.width/2-player.size[0]/2, game_view.height/2-player.size[1]/2, player.size[0], player.size[1]);
+  if (world_img.floor.ready) game.drawImage(world_img.floor, cvw(world.pos[0])+game_view.width/2, cvw(world.pos[1])+game_view.height/2, cvw(world.size[0]), cvw(world.size[1]))
+  if (player.img.ready) game.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
   for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
     let pj = gx.pjs[i];
     if(pj.img.ready) game.drawImage(
          pj.img, 
-         pj.pos[0]+world.pos[0]+game_view.width/2,
-         pj.pos[1]+world.pos[1]+game_view.height/2,
-         pj.size[0],
-         pj.size[1]
+         cvw(pj.pos[0]+world.pos[0])+game_view.width/2,
+         cvw(pj.pos[1]+world.pos[1])+game_view.height/2,
+         cvw(pj.size[0]),
+         cvw(pj.size[1])
     );
   }
   

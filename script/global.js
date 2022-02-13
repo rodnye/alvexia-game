@@ -66,6 +66,7 @@ mx.BImg = function(d){
 }
 
 dg = n=>{console.log(n);return n};
+cvw = n=>screen.width*(n*100/720)/100;
 
 //parseador de status del server
 var raw;

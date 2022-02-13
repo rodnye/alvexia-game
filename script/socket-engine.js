@@ -88,10 +88,10 @@ engine.world_add_player = d=> {
   let is_user = config.USER.name==d.username;
   if(!is_user) gx.pjs[d.username] = {};
   let player = is_user?gx.player:gx.pjs[d.username];
-  player.pos = [stats.pos.x, stats.pos.y];
-  player.deg = stats.pos.angle;
-  player.size = [stats.size.x, stats.size.y];
-  player.texture = stats.skin;
+    player.pos = [stats.pos.x, stats.pos.y];
+    player.deg = stats.pos.angle;
+    player.size = [stats.size.x, stats.size.y];
+    player.texture = stats.skin;
   
   player.img = new Image();
   player.img.onload = ()=> {player.img.ready = true};

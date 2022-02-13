@@ -30,6 +30,10 @@ function OnStart() {
   game = game_view.getContext("2d");
   game_view.width = screen.width;
   game_view.height = screen.height;
+  
+  //obtener elementos
+  btns = dom.getAll("button.btn-action-items");
+  for(let i = 0; i < btns.length; i++) btns[i].dom.on("touchstart",()=>{})
 
   engine.init();
   Connect();

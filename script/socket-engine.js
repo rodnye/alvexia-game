@@ -1,4 +1,6 @@
 total_emit = 0;
+delay_emit = 0;
+delay_emit_count = 0;
 engine.socket = (socket)=> {
 
   // LOAD MAP //
@@ -67,10 +69,12 @@ engine.socket = (socket)=> {
   // MOVER //
   socket.on("move_pj", d=> {
     let is_user = config.USER.name == d.username;
-    let player = is_user?gx.player: gx.pjs[d.username];
+    let player = is_user? gx.player : gx.pjs[d.username];
     player.pos = [d.pos.x, d.pos.y];
     player.deg = d.pos.angle;
-
+    delay_emit -= Date.now();
+    delay_emit_count = -delay_emit/1000;
+    delay_emit = Date.now();
     if (is_user) gx.world.pos = [
       -d.pos.x,
       -d.pos.y

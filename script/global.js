@@ -65,6 +65,8 @@ mx.BImg = function(d){
   return d+".png";
 }
 
+dg = n=>{console.log(n);return n};
+
 //parseador de status del server
 var raw;
 class RawParser {

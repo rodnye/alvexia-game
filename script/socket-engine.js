@@ -18,7 +18,9 @@ engine.socket = (socket)=> {
         },
         biome : "nature",
         terrain : {},
-        objects : {},
+        objects : {
+          
+        },
         npcs : {},
         pjs : {}
     } */

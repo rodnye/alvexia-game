@@ -47,7 +47,12 @@ engine.init = ()=> {
   // LOGICA //
   mx.Animate(gx._engine_fps, ()=>{
     if(config.USER.is_connect){
-      if(player._emit_joy_enable && player._mov_enable){
+      
+      let p_cx = mx.round(player.pos[0] + (player.mov[0]>player.speed?player.speed:player.mov[0]));
+      let p_cy = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
+      
+      
+      if((p_cx != player.pos[0] || p_cy != player.pos[1]) && player._emit_joy_enable && player._mov_enable){
         //emitir al servidor
         socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
         total_emit++;
@@ -55,9 +60,19 @@ engine.init = ()=> {
         window.setTimeout(()=>{player._mov_enable=true}, 1000/gx._emitps);
       }
       
-      //mover personaje localmente
-      player.pos[0] = mx.round(player.pos[0] + (player.mov[0]>player.speed?player.speed:player.mov[0]));
-      player.pos[1] = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
+      //no salirse del mapa
+      if( p_cx > player.size[0]/2 ) {
+        if (p_cx > world.size[0] - player.size[0]/2) p_cx = world.size[0] - player.size[0]/2;
+      } else p_cx = player.size[0]/2;
+      
+      if( p_cy > player.size[1]/2 ) {
+        if (p_cy > world.size[1] - player.size[1]/2) p_cy = world.size[1] - player.size[1]/2;
+      } else p_cy = player.size[1]/2;
+      
+      //desplazar
+      player.pos[0] = p_cx;
+      player.pos[1] = p_cy;
+      
       gx.world.pos = [-player.pos[0],-player.pos[1]];
       
     }
@@ -84,6 +99,17 @@ engine.load_world = () => {
   
   gx.world.img_data.floor = img_floor;
 };
+
+// COLISION //
+engine.colision = (o1, o2) => {
+  if(
+    o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
+    o1.pos[0] <= o2.pos[0] + o2.size[0] && //izquierda o1
+    o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
+    o1.pos[1] <= (o2.pos[1] + o2.size[1])  //abajo o1
+  ) return true;
+  else return false;
+}
 
 // PINTAR FRAME //
 engine.generate_frame = () => {

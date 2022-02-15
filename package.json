@@ -2,7 +2,7 @@
   "name": "alvexia-app",
   "version": "0.0.1",
   "description": "Juego MMORPG",
-  "main": "Alvexia.js",
+  "main": "alvexia-proyect.js",
   "scripts": {
     "test": "droidscript ide"
   },

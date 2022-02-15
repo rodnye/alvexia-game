@@ -7,7 +7,7 @@ mx = {};
 
 mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
-mx.open = url => window.open(url);
+mx.open = url => location.href = url;
 mx.Alert = txt=>app.Alert(txt);
 mx.debug_init = ()=>new Debugger("console").enable();
 
@@ -65,8 +65,14 @@ mx.BImg = function(d){
   return d+".png";
 }
 
+//redondear
+mx.round = function(num) {
+    var m = Number((Math.abs(num) * 100).toPrecision(15));
+    return Math.round(m) / 100 * Math.sign(num);
+}
+
 dg = n=>{console.log(n);return n};
-cvw = n=>screen.width*(n*100/720)/100;
+cvw = n=>n//screen.width*(n*100/720)/100;
 
 //parseador de status del server
 var raw;

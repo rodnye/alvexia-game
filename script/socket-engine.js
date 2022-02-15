@@ -68,22 +68,33 @@ engine.socket = (socket)=> {
 
   // MOVER //
   socket.on("move_pj", d=> {
-    let is_user = config.USER.name == d.username;
-    let player = is_user? gx.player : gx.pjs[d.username];
-    player.pos = [d.pos.x, d.pos.y];
-    player.deg = d.pos.angle;
+    /* formato de datos
+       0 => username
+       1 => posx
+       2 => posy
+       3 => angle
+    */
+    d = d.split("&");
+    d[1] = parseFloat(d[1]);
+    d[2] = parseFloat(d[2]);
+    d[3] = parseFloat(d[3]);
+    let is_user = config.USER.name == d[0];
+    let player = is_user? gx.player : gx.pjs[d[0]];
+    player.pos = [d[1], d[2]];
+    player.deg = d[3];
     delay_emit -= Date.now();
     delay_emit_count = -delay_emit/1000;
     delay_emit = Date.now();
     if (is_user) gx.world.pos = [
-      -d.pos.x,
-      -d.pos.y
+      -d[1],
+      -d[2]
     ];
   })
 
 }
 
 engine.world_add_player = d=> {
+  console.log("player "+d.username+" added ><");
   let stats = d.pjstats;
   let is_user = config.USER.name==d.username;
   if(!is_user) gx.pjs[d.username] = {};

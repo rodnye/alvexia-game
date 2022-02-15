@@ -4,7 +4,9 @@ var gx = {
   player: null,
   world: null,
   pjs: {},
-  _emitps: 120,
+  
+  _emitps: 30,
+  _engine_fps: 30
 };
 
 
@@ -17,7 +19,7 @@ engine.init = ()=> {
     mov: [0,0],
     size: [40, 50],
     deg: 0,
-    texture: "hero_",
+    texture: null,
     img: new Image(),
     
     _mov_enable: true,
@@ -43,19 +45,19 @@ engine.init = ()=> {
   mx.Animate("frame", engine.generate_frame).start();
   
   // LOGICA //
-  mx.Animate(60, ()=>{
+  mx.Animate(gx._engine_fps, ()=>{
     if(config.USER.is_connect){
       if(player._emit_joy_enable && player._mov_enable){
         //emitir al servidor
-        socket.emit("move_pj", {x:player.pos[0], y:player.pos[1]});
+        socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
         total_emit++;
         player._mov_enable = false;
         window.setTimeout(()=>{player._mov_enable=true}, 1000/gx._emitps);
       }
       
       //mover personaje localmente
-      player.pos[0] += player.mov[0]>player.speed?player.speed:player.mov[0];
-      player.pos[1] += player.mov[1]>player.speed?player.speed:player.mov[1];
+      player.pos[0] = mx.round(player.pos[0] + (player.mov[0]>player.speed?player.speed:player.mov[0]));
+      player.pos[1] = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
       gx.world.pos = [-player.pos[0],-player.pos[1]];
       
     }
@@ -67,8 +69,8 @@ engine.init = ()=> {
 engine.joystick = d => {
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
-    player.mov[0] = d.x/100*player.speed;
-    player.mov[1] = -d.y/100*player.speed;
+    player.mov[0] = mx.round(d.x/100*player.speed);
+    player.mov[1] = mx.round(-d.y/100*player.speed);
 }
 
 // GENERAR WORLD //

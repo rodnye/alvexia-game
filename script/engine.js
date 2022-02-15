@@ -52,7 +52,7 @@ engine.init = ()=> {
       let p_cy = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
       
       
-      if((p_cx != player.pos[0] || p_cy != player.pos[1]) && player._emit_joy_enable && player._mov_enable){
+      if((p_cx !== player.pos[0] && p_cy !== player.pos[1]) && player._emit_joy_enable && player._mov_enable){
         //emitir al servidor
         socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
         total_emit++;
@@ -61,13 +61,13 @@ engine.init = ()=> {
       }
       
       //no salirse del mapa
-      if( p_cx > player.size[0]/2 ) {
-        if (p_cx > world.size[0] - player.size[0]/2) p_cx = world.size[0] - player.size[0]/2;
-      } else p_cx = player.size[0]/2;
+      if( p_cx > 0 ) {
+        if (p_cx > world.size[0]) p_cx = world.size[0]// - player.size[0]/2;
+      } else p_cx = 0;
       
-      if( p_cy > player.size[1]/2 ) {
-        if (p_cy > world.size[1] - player.size[1]/2) p_cy = world.size[1] - player.size[1]/2;
-      } else p_cy = player.size[1]/2;
+      if( p_cy > 0 ) {
+        if (p_cy > world.size[1]) p_cy = world.size[1]//- player.size[1]/2;
+      } else p_cy = 0;
       
       //desplazar
       player.pos[0] = p_cx;
@@ -118,7 +118,7 @@ engine.generate_frame = () => {
   let world = gx.world;
   let world_img = world.img_data;
   
-  if (world_img.floor.ready) game.drawImage(world_img.floor, cvw(world.pos[0])+game_view.width/2, cvw(world.pos[1])+game_view.height/2, cvw(world.size[0]), cvw(world.size[1]))
+  if (world_img.floor.ready) game.drawImage(world_img.floor, cvw(world.pos[0]-player.size[0]/2)+game_view.width/2, cvw(world.pos[1]-player.size[1]/2)+game_view.height/2, cvw(world.size[0]+player.size[0]), cvw(world.size[1]+player.size[1]))
   if (player.img.ready) game.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
   for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
     let pj = gx.pjs[i];

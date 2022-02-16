@@ -4,6 +4,7 @@ var gx = {
   player: null,
   world: null,
   pjs: {},
+  obj: {},
   
   _emitps: 30,
   _engine_fps: 30
@@ -35,7 +36,8 @@ engine.init = ()=> {
     bioma: "nature",
     textures: [],
     img_data: {
-      floor: null
+      floor: null,
+      tree_1: null,
     }
   };
   var world = gx.world;
@@ -69,6 +71,14 @@ engine.init = ()=> {
         if (p_cy > world.size[1]) p_cy = world.size[1]//- player.size[1]/2;
       } else p_cy = 0;
       
+      //esta colisionando con algo?
+      const obj = gx.obj[engine.atile(p_cx)+"_"+engine.atile(p_cy)];
+      if(obj){
+        let colision = engine.colision(player,obj);
+        if(colision.x) p_cx = player.pos[0];
+        if(colision.y) p_cy = player.pos[1];
+      }
+      
       //desplazar
       player.pos[0] = p_cx;
       player.pos[1] = p_cy;
@@ -90,25 +100,26 @@ engine.joystick = d => {
 
 // GENERAR WORLD //
 engine.load_world = () => {
+  const world = gx.world;
   let path_world = config.PATH.img_world + "/" + gx.world.bioma;
-  let img_floor = new Image();
-      img_floor.onload = ()=>{img_floor.ready=true};
-      img_floor.src = mx.BImg(path_world+"/base");
-      img_floor.width = 50;
-      img_floor.height = 50;
   
-  gx.world.img_data.floor = img_floor;
+  world.img_data.floor = engine.img(mx.BImg(path_world+"/base"),50,50);
+  world.img_data.tree_1 = engine.img(mx.BImg(path_world+"/tree_1"),50,50)
 };
 
 // COLISION //
 engine.colision = (o1, o2) => {
-  if(
-    o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
-    o1.pos[0] <= o2.pos[0] + o2.size[0] && //izquierda o1
-    o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
-    o1.pos[1] <= (o2.pos[1] + o2.size[1])  //abajo o1
-  ) return true;
-  else return false;
+  let res = {x:false,y:false};
+  if(o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
+     o1.pos[0] <= o2.pos[0] + o2.size[0]    //izquierda o1
+  ) res.x = true;
+  
+  if(o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
+     o1.pos[1] <= (o2.pos[1] + o2.size[1])  //abajo o1
+  ) res.y = true;
+  
+  res.t = res.x||res.y;
+  return res;
 }
 
 // PINTAR FRAME //
@@ -120,6 +131,8 @@ engine.generate_frame = () => {
   
   if (world_img.floor.ready) game.drawImage(world_img.floor, cvw(world.pos[0]-player.size[0]/2)+game_view.width/2, cvw(world.pos[1]-player.size[1]/2)+game_view.height/2, cvw(world.size[0]+player.size[0]), cvw(world.size[1]+player.size[1]))
   if (player.img.ready) game.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
+ 
+  //dibujar players
   for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
     let pj = gx.pjs[i];
     if(pj.img.ready) game.drawImage(
@@ -130,6 +143,19 @@ engine.generate_frame = () => {
          cvw(pj.size[1])
     );
   }
+  //dibujar objetos
+  for(let i in gx.obj ) {
+    let obj = gx.obj[i];
+    let img = gx.world.img_data[obj.name];
+    if(img.ready) game.drawImage(
+      img,
+      cvw(obj.pos[0] + world.pos[0])+game_view.width/2,
+      cvw(obj.pos[1] + world.pos[1])+game_view.height/2,
+      cvw(obj.size[0]),
+      cvw(obj.size[1])
+    )
+  }
+  
   
   engine.debug([
     "player x: "+player.pos[0],
@@ -146,7 +172,19 @@ engine.generate_frame = () => {
 // BORRAR FRAME //
 engine.clear_frame = () => game.clearRect(0,0,game_view.width, game_view.height);
 
-engine.tile = n=>n*gx.world.img_data.floor.width;
+// crear imagen //
+engine.img = (src, w, h)=>{
+  let img = new Image();
+  img.src = src;
+  img.onload = ()=>{img.ready=true};
+  img.width = w;
+  img.height = h;
+  return img;
+}
+
+// parseador de tile //
+engine.tile = n=> n * gx.world.img_data.floor.width;
+engine.atile = n=> Math.round(n/gx.world.img_data.floor.width);
 
 // DEBUG CANVAS //
 engine.debug = txt=>{

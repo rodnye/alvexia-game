@@ -71,6 +71,8 @@ engine.init = ()=> {
         if (p_cy > world.size[1]) p_cy = world.size[1]//- player.size[1]/2;
       } else p_cy = 0;
       
+      /*AUN EN DESARROLLO
+      
       //esta colisionando con algo?
       const obj = gx.obj[engine.atile(p_cx)+"_"+engine.atile(p_cy)];
       if(obj){
@@ -78,6 +80,7 @@ engine.init = ()=> {
         if(colision.x) p_cx = player.pos[0];
         if(colision.y) p_cy = player.pos[1];
       }
+      */
       
       //desplazar
       player.pos[0] = p_cx;

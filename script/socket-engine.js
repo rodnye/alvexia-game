@@ -5,7 +5,7 @@ engine.socket = (socket)=> {
 
   // LOAD MAP //
   socket.on("load_map", d=> {
-    console.log("ws load_map ><")
+    console.log("ws load_map")
     /* map = {
         name : WORDNAME,
         pos : {

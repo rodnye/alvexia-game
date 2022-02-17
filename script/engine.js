@@ -6,13 +6,19 @@ var gx = {
   pjs: {},
   obj: {},
   
-  _emitps: 30,
-  _engine_fps: 30
+  /*atributos editables*/
+  _paint_offset: 100, //espacio de dibujado fuera de la pantalla
+  _tile_size: 50, //tamaño de cuadrícula
+  _screen_reference: 720, //ancho de pantalla de referencia para escala
+  _emitps: 30,  //emit por segundo
+  _engine_fps: 30,  //cuadros por segundo
 };
 
 
 // INICIALIZAR JUEGO //
 engine.init = ()=> {
+  cvw = n=>screen.width*(n*100/gx._screen_reference)/100;
+  gx._paint_offset = cvw(gx._paint_offset);
   // PLAYER //
   gx.player = {
     pos: [0,0],
@@ -23,7 +29,6 @@ engine.init = ()=> {
     texture: null,
     img: new Image(),
     
-    _mov_enable: true,
     _emit_joy_enable: false,
   };
   
@@ -52,15 +57,6 @@ engine.init = ()=> {
       
       let p_cx = mx.round(player.pos[0] + (player.mov[0]>player.speed?player.speed:player.mov[0]));
       let p_cy = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
-      
-      
-      if((p_cx !== player.pos[0] && p_cy !== player.pos[1]) && player._emit_joy_enable && player._mov_enable){
-        //emitir al servidor
-        socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
-        total_emit++;
-        player._mov_enable = false;
-        window.setTimeout(()=>{player._mov_enable=true}, 1000/gx._emitps);
-      }
       
       //no salirse del mapa
       if( p_cx > 0 ) {
@@ -91,6 +87,14 @@ engine.init = ()=> {
     }
   }).start()
   
+  // EMITIR AL SERVIDOR //
+  mx.Animate(gx._emitps, ()=>{
+    if(player._emit_joy_enable){
+        socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
+        total_emit++;
+    }
+  }).start()
+  
 }
 
 // ACCIONES JOYSTICK //
@@ -106,7 +110,7 @@ engine.load_world = () => {
   const world = gx.world;
   let path_world = config.PATH.img_world + "/" + gx.world.bioma;
   
-  world.img_data.floor = engine.img(mx.BImg(path_world+"/base"),50,50);
+  world.img_data.floor = engine.img(mx.BImg(path_world+"/base"),gx._tile_size,gx._tile_size);
   world.img_data.tree_1 = engine.img(mx.BImg(path_world+"/tree_1"),50,50)
 };
 
@@ -132,31 +136,54 @@ engine.generate_frame = () => {
   let world = gx.world;
   let world_img = world.img_data;
   
-  if (world_img.floor.ready) game.drawImage(world_img.floor, cvw(world.pos[0]-player.size[0]/2)+game_view.width/2, cvw(world.pos[1]-player.size[1]/2)+game_view.height/2, cvw(world.size[0]+player.size[0]), cvw(world.size[1]+player.size[1]))
+  let mx = cvw(world.pos[0]-player.size[0]/2)+game_view.width/2;
+  let my = cvw(world.pos[1]-player.size[1]/2)+game_view.height/2
+  if (world_img.floor.ready) 
+   for(let y = my; y <= cvw(world.size[1]+player.size[1]+world.pos[1])+gx._paint_offset; y+=cvw(world_img.floor.width)) {
+     if(y >= -gx._paint_offset)
+       for(let x = mx; x <= cvw(world.size[0]+player.size[0]+world.pos[0])+gx._paint_offset; x+=cvw(world_img.floor.height))
+         if(x >= -gx._paint_offset) game.drawImage(world_img.floor, x, y, cvw(world_img.floor.width), cvw(world_img.floor.height));
+   }
+   //game.drawImage(world_img.floor, cvw(world.pos[0]-player.size[0]/2)+game_view.width/2, cvw(world.pos[1]-player.size[1]/2)+game_view.height/2, cvw(world.size[0]+player.size[0]), cvw(world.size[1]+player.size[1]))
+  
+  
   if (player.img.ready) game.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
  
-  //dibujar players
+  // DIBUJAR PLAYERS //
   for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
     let pj = gx.pjs[i];
-    if(pj.img.ready) game.drawImage(
-         pj.img, 
-         cvw(pj.pos[0] + world.pos[0] - pj.size[0]/2)+game_view.width/2,
-         cvw(pj.pos[1] + world.pos[1] - pj.size[1]/2)+game_view.height/2,
-         cvw(pj.size[0]),
-         cvw(pj.size[1])
-    );
+    let pos = [
+      cvw(pj.pos[0] + world.pos[0])+game_view.width/2,
+      cvw(pj.pos[1] + world.pos[1])+game_view.height/2
+    ];
+    
+    //si está dentro del rango de visión
+    if(
+      pos[0] >= -gx._paint_offset && 
+      pos[0] <= game_view.width + gx._paint_offset &&
+      pos[1] >= -gx._paint_offset && 
+      pos[1] <= game_view.height + gx._paint_offset
+    ) 
+     if(pj.img.ready) game.drawImage(pj.img, pos[0], pos[1], cvw(pj.size[0]), cvw(pj.size[1]));
   }
-  //dibujar objetos
+  
+  // DIBUJAR OBJETOS //
   for(let i in gx.obj ) {
     let obj = gx.obj[i];
     let img = gx.world.img_data[obj.name];
-    if(img.ready) game.drawImage(
-      img,
+    let pos = [
       cvw(obj.pos[0] + world.pos[0])+game_view.width/2,
-      cvw(obj.pos[1] + world.pos[1])+game_view.height/2,
-      cvw(obj.size[0]),
-      cvw(obj.size[1])
-    )
+      cvw(obj.pos[1] + world.pos[1])+game_view.height/2
+    ];
+    
+    //si está dentro del rango de visión
+    if(
+      pos[0] >= -gx._paint_offset && 
+      pos[0] <= game_view.width + gx._paint_offset &&
+      pos[1] >= -gx._paint_offset && 
+      pos[1] <= game_view.height + gx._paint_offset
+    ) 
+      if(img.ready) game.drawImage(img, pos[0], pos[1], cvw(obj.size[0]),cvw(obj.size[1]))
   }
   
   

@@ -72,7 +72,7 @@ mx.round = function(num) {
 }
 
 dg = n=>{console.log(n);return n};
-cvw = n=>screen.width*(n*100/720)/100;
+cvw = ni=>screen.width*(n*100/720)/100;
 
 //parseador de status del server
 var raw;

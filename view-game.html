@@ -15,7 +15,10 @@
 
 <body onload="app.Start()">
   
-  <canvas id=game-view></canvas>
+  <div id=game-view>
+    <canvas class="fg-layer"></canvas>
+    <canvas class="bg-layer"></canvas>
+  </div>
 	<div id=joystick></div>
 	
 	<div id=action-container>
@@ -40,7 +43,7 @@
 	     </div>
 	   </div>
 	</div>
-	
+	<input type=range id=lupa value=50/>
 	
 </body>
 </html>

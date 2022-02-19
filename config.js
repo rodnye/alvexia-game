@@ -19,7 +19,8 @@ config = {
         lib: "./Html",
         script: "./script",
         data: "/sdcard/Android/data/"+"{{PACKAGE}}",
-      }
+      },
+      TEST_ENABLE: true
 }
 
 //function parseadora de string

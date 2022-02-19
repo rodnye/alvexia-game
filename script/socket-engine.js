@@ -103,7 +103,7 @@ engine.socket = (socket)=> {
 
 }
 
-engine.world_add_player = d=> {
+engine.world_add_player = d => {
   console.log("player "+d.username+" added");
   //alert(JSON.stringify(d))
   let stats = d.pjstats;

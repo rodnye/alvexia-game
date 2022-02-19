@@ -7,6 +7,18 @@
   width: 100vw;
   height: 100vh;
 }
+#game-view > canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+canvas.fg-layer {
+  z-index: 1;
+  background-color: rgba(0,0,0,0);
+}
+canvas.bg-layer {
+  z-index: 0;
+}
 
 /* CONTROLES */
 #joystick {
@@ -57,4 +69,13 @@ button.btn-action-items {
   width: 60px;
   height: 60px;
   background: blue;
+}
+
+/* OPCIONES DE TESTEO */
+#lupa {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: #ffffff;
 }

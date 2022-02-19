@@ -21,22 +21,34 @@ function OnStart() {
   
   
   game_view = dom.get("#game-view");
+  fg_game_view = dom.get("canvas.fg-layer");
+  bg_game_view = dom.get("canvas.bg-layer");
   joy = new JoyStick("joystick", {}, engine.joystick);
-
-  //comprobar si tiene soporte
-  if (!game_view.getContext) return app.Quit(raw.parse("CANVAS_ERROR"));
-
-  //inicializando api de canvas
-  game = game_view.getContext("2d");
+  
   game_view.width = screen.width;
   game_view.height = screen.height;
+  fg_game_view.width = screen.width;
+  fg_game_view.height = screen.height;
+  bg_game_view.width = screen.width;
+  bg_game_view.height = screen.height;
   
-  //obtener elementos
+  //comprobar si tiene soporte
+  if (!fg_game_view.getContext) return app.Quit(raw.parse("CANVAS_ERROR"));
+
+  //inicializando api de canvas
+  fgame = fg_game_view.getContext("2d"); //capa delantera
+  bgame = bg_game_view.getContext("2d"); //capa de fondo
+  
+  //obtener elementos del DOM
   btns = dom.getAll("button.btn-action-items");
   for(let i = 0; i < btns.length; i++) btns[i].dom.on("touchstart",()=>{})
-
+  
+  //mantener la pantalla
+  mx.Animate(0.3, () => app.SetScreenMode("Game")).start()
+  
   engine.init();
   Connect();
+  if(config.TEST_ENABLE) ActivateTest()
 }
 
 
@@ -64,4 +76,14 @@ function Connect() {
   
   engine.socket(socket);
   
+}
+
+// OPCIONES DE TESTEO //
+function ActivateTest(){
+  let ss = gx._screen_reference;
+  input_lupa = dom.get("#lupa");
+  input_lupa.style.display = "inline";
+  input_lupa.onchange = ()=>{
+    gx._screen_reference = ss*(parseFloat(input_lupa.value)/100)*2;
+  }
 }

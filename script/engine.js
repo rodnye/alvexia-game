@@ -10,7 +10,7 @@ var gx = {
   _paint_offset: 100, //espacio de dibujado fuera de la pantalla
   _tile_size: 50, //tamaño de cuadrícula
   _screen_reference: 620, //ancho de pantalla de referencia para escala
-  _emitps: 30,  //emit por segundo
+  _emitps: 5,  //emit por segundo
   _engine_fps: 30,  //cuadros por segundo
   _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
   _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
@@ -142,6 +142,7 @@ engine.colision = (o1, o2, coord="N") => {
 
 // PINTAR FRAME //
 engine.generate_frame = () => {
+  if(config.TEST_ENABLE) fps_count.tickStart();
   engine.clear_frame();
   let player = gx.player;
   let world = gx.world;
@@ -206,16 +207,19 @@ engine.generate_frame = () => {
   }
   
   
-  if(config.TEST_ENABLE) engine.debug([
-    "player x: "+player.pos[0],
-    "player y: "+player.pos[1],
-    "mov x: "+player.mov[0],
-    "mov y: "+player.mov[1],
-    "world x: "+world.pos[0],
-    "world y: "+world.pos[1],
-    "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)",
-    "delay emits: "+delay_emit_count+"s"
-  ])
+  if(config.TEST_ENABLE) {
+    engine.debug([
+      "player x: "+player.pos[0],
+      "player y: "+player.pos[1],
+      "mov x: "+player.mov[0],
+      "mov y: "+player.mov[1],
+      "world x: "+world.pos[0],
+      "world y: "+world.pos[1],
+      "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)",
+      "delay emits: "+delay_emit_count+"s"
+    ]);
+    fps_count.tick();
+  }
 }
 
 // BORRAR FRAME //

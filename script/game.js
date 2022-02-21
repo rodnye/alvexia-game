@@ -4,6 +4,7 @@ app.Script(config.PATH.script+"/global.js");
 var engine = {};
 app.Script(config.PATH.script+"/engine.js");
 app.Script(config.PATH.script+"/socket-engine.js");
+app.Script(config.PATH.lib+"/fpsmeter.min.js");
 
 
 function OnStart() {
@@ -50,9 +51,9 @@ function OnStart() {
   //mantener la pantalla
   mx.Animate(0.3, () => app.SetScreenMode("Game")).start()
   
+  if(config.TEST_ENABLE) ActivateTest()
   engine.init();
   Connect();
-  if(config.TEST_ENABLE) ActivateTest()
 }
 
 
@@ -84,6 +85,11 @@ function Connect() {
 
 // OPCIONES DE TESTEO //
 function ActivateTest(){
+  fps_count = new FPSMeter({
+    left: "auto",
+    right: screen.width/2+"px"
+  });
+  
   let sr = gx._screen_reference;
   let pf = gx._paint_offset;
   input_lupa = dom.get("#lupa");

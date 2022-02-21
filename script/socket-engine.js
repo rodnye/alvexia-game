@@ -85,19 +85,38 @@ engine.socket = (socket)=> {
        3 => angle
     */
     d = d.split("&");
-    d[1] = parseFloat(d[1]);
-    d[2] = parseFloat(d[2]);
-    d[3] = parseFloat(d[3]);
-    let is_user = config.USER.name == d[0];
-    let player = is_user? gx.player : gx.pjs[d[0]];
-    player.pos = [d[1], d[2]];
-    player.deg = d[3];
+    let name = d[0];
+    let x = parseFloat(d[1]);
+    let y = parseFloat(d[2]);
+    let a = parseFloat(d[3]);
+    let is_user = config.USER.name == name;
+    let player = is_user? gx.player : gx.pjs[name];
+    
+    if(player.smooth) {
+      player.smooth.stop();
+      delete player.smooth;
+    }
+    let deltaX = x - player.pos[0];
+    let deltaY = y - player.pos[1];
+    player.mov[0] = deltaX / gx._smooth_mov_steps;
+    player.mov[1] = deltaY / gx._smooth_mov_steps;
+    
+    let i = 0;
+    player.smooth = mx.Animate(gx._smooth_mov_fps, ()=>{
+      player.pos[0] += player.mov[0];
+      player.pos[1] += player.mov[1];
+      if(i >= gx._smooth_mov_steps) return player.smooth.stop();
+      i++
+    });
+    player.smooth.start();
+    
+    player.deg = a;
     delay_emit -= Date.now();
     delay_emit_count = -delay_emit/1000;
     delay_emit = Date.now();
     if (is_user) gx.world.pos = [
-      -d[1],
-      -d[2]
+      -x,
+      -y
     ];
   })
 
@@ -112,6 +131,7 @@ engine.world_add_player = d => {
   if(!is_user) gx.pjs[d.username] = {};
   let player = is_user?gx.player:gx.pjs[d.username];
     player.pos = [stats.pos.x, stats.pos.y];
+    player.mov = [0,0];
     player.deg = stats.pos.angle;
     player.size = [engine.tile(parseFloat(size[0])), engine.tile(parseFloat(size[1]))];
     player.texture = stats.skin;

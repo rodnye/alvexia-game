@@ -12,6 +12,8 @@ var gx = {
   _screen_reference: 620, //ancho de pantalla de referencia para escala
   _emitps: 30,  //emit por segundo
   _engine_fps: 30,  //cuadros por segundo
+  _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
+  _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
 };
 
 
@@ -68,16 +70,17 @@ engine.init = ()=> {
         if (p_cy > world.size[1]) p_cy = world.size[1]//- player.size[1]/2;
       } else p_cy = 0;
       
-      /*AUN EN DESARROLLO
-      
+      //AUN EN DESARROLLO
       //esta colisionando con algo?
-      const obj = gx.obj[engine.atile(p_cx)+"_"+engine.atile(p_cy)];
-      if(obj){
-        let colision = engine.colision(player,obj);
-        if(colision.x) p_cx = player.pos[0];
-        if(colision.y) p_cy = player.pos[1];
+      const obj1 = gx.obj[engine.atile(p_cx - player.size[0]/2)+"_"+engine.atile(p_cy - player.size[1]/2)];
+      const obj2 = gx.obj[engine.atile(p_cx + player.size[0]/2)+"_"+engine.atile(p_cy + player.size[1]/2)]
+      if(obj1 || obj2){
+        let obj = obj1 || obj2;
+        let colision = engine.colision(player, obj, engine.direction(player.mov[0], player.mov[1]));
+        if(colision.t) p_cx = player.pos[0];
+        if(colision.t) p_cy = player.pos[1];
       }
-      */
+      
       
       //desplazar
       player.pos[0] = p_cx;
@@ -112,17 +115,24 @@ engine.load_world = () => {
   let path_world = config.PATH.img_world + "/" + gx.world.bioma;
   
   world.img_data.floor = engine.img(mx.BImg(path_world+"/base"),gx._tile_size,gx._tile_size);
-  world.img_data.tree_1 = engine.img(mx.BImg(path_world+"/tree_1"),50,50)
+  world.img_data.tree_1 = engine.img(mx.BImg(path_world+"/tree_1"),50,50);
+  
+  // PREPARAR DIBUJADO CAPA SUPERIOR //
+  tgame.textAlign = "center";
+  tgame.font = cvw(25)+"px";
 };
 
 // COLISION //
-engine.colision = (o1, o2) => {
-  let res = {x:false,y:false};
-  if(o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
+engine.colision = (o1, o2, coord="N") => {
+  let res = {x:false , y:false};
+  
+  if(/N|S/i.test(coord) &&
+     o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
      o1.pos[0] <= o2.pos[0] + o2.size[0]    //izquierda o1
   ) res.x = true;
   
-  if(o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
+  if(/W|E/i.test(coord) &&
+     o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
      o1.pos[1] <= (o2.pos[1] + o2.size[1])  //abajo o1
   ) res.y = true;
   
@@ -147,15 +157,15 @@ engine.generate_frame = () => {
          if(x >= -gx._paint_offset) bgame.drawImage(world_img.floor, x, y, cvw(world_img.floor.width), cvw(world_img.floor.height));
    }
   
-  
+  // DIBUJAR JUGADOR //
   if (player.img.ready) fgame.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
  
   // DIBUJAR PLAYERS //
-  for (let i in gx.pjs) if(gx.pjs[i]!==undefined) {
+  for (let i in gx.pjs) if(gx.pjs[i]) {
     let pj = gx.pjs[i];
     let pos = [
-      cvw(pj.pos[0] + world.pos[0])+game_view.width/2,
-      cvw(pj.pos[1] + world.pos[1])+game_view.height/2
+      cvw(pj.pos[0] + world.pos[0] - pj.size[0]/2)+game_view.width/2,
+      cvw(pj.pos[1] + world.pos[1] - pj.size[1]/2)+game_view.height/2
     ];
     
     //si está dentro del rango de visión
@@ -165,7 +175,15 @@ engine.generate_frame = () => {
       pos[1] >= -gx._paint_offset && 
       pos[1] <= game_view.height + gx._paint_offset
     ) 
-     if(pj.img.ready) fgame.drawImage(pj.img, pos[0], pos[1], cvw(pj.size[0]), cvw(pj.size[1]));
+     if(pj.img.ready) {
+       //dibujar letrero del player
+       var pos_name = [
+         pos[0]+cvw(pj.size[0]/2),
+         pos[1]-cvw(5)
+       ]
+       fgame.drawImage(pj.img, pos[0], pos[1], cvw(pj.size[0]), cvw(pj.size[1]));
+       tgame.fillText(i, pos_name[0], pos_name[1], cvw(pj.size[0]));
+     }
   }
   
   // DIBUJAR OBJETOS //
@@ -202,11 +220,12 @@ engine.generate_frame = () => {
 
 // BORRAR FRAME //
 engine.clear_frame = () => {
+  tgame.clearRect(0,0,game_view.width, game_view.height);
   fgame.clearRect(0,0,game_view.width, game_view.height);
   bgame.clearRect(0,0,game_view.width, game_view.height);
 }
 
-// crear imagen //
+// CREAR IMAGEN //
 engine.img = (src, w, h)=>{
   let img = new Image();
   img.src = src;
@@ -216,15 +235,29 @@ engine.img = (src, w, h)=>{
   return img;
 }
 
-// parseador de tile //
+// CONVERSOR DE TILES //
 engine.tile = n=> n * gx.world.img_data.floor.width;
 engine.atile = n=> Math.floor(n/gx.world.img_data.floor.width);
+
+// DIRECCION //
+engine.direction = (x, y) => {
+  let rad = Math.atan2(y,x);
+  let deg = rad * (180/Math.PI);
+  /*
+      N
+    W   E
+      S
+  */
+  return 45<=deg && deg<135? "N" :
+        135<=deg && deg<225? "W" :
+        225<=deg && deg<315? "S" : "E" 
+}
 
 // DEBUG CANVAS //
 engine.debug = txt=>{
   let ww = 10;
   for(let i of txt){
-    fgame.fillText(i,10,ww)
+    tgame.fillText(i,10,ww)
     ww+=10;
   };
 }

@@ -21,12 +21,15 @@ function OnStart() {
   
   
   game_view = dom.get("#game-view");
+  tg_game_view = dom.get("canvas.tg-layer");
   fg_game_view = dom.get("canvas.fg-layer");
   bg_game_view = dom.get("canvas.bg-layer");
   joy = new JoyStick("joystick", {}, engine.joystick);
   
   game_view.width = screen.width;
   game_view.height = screen.height;
+  tg_game_view.width = screen.width;
+  tg_game_view.height = screen.height;
   fg_game_view.width = screen.width;
   fg_game_view.height = screen.height;
   bg_game_view.width = screen.width;
@@ -36,6 +39,7 @@ function OnStart() {
   if (!fg_game_view.getContext) return app.Quit(raw.parse("CANVAS_ERROR"));
 
   //inicializando api de canvas
+  tgame = tg_game_view.getContext("2d"); //capa superior
   fgame = fg_game_view.getContext("2d"); //capa delantera
   bgame = bg_game_view.getContext("2d"); //capa de fondo
   
@@ -80,10 +84,12 @@ function Connect() {
 
 // OPCIONES DE TESTEO //
 function ActivateTest(){
-  let ss = gx._screen_reference;
+  let sr = gx._screen_reference;
+  let pf = gx._paint_offset;
   input_lupa = dom.get("#lupa");
   input_lupa.style.display = "inline";
   input_lupa.onchange = ()=>{
-    gx._screen_reference = ss*(parseFloat(input_lupa.value)/100)*2;
+    gx._screen_reference = sr*(parseFloat(input_lupa.value)/100)*2;
+    gx._paint_offset = pf*(parseFloat(input_lupa.value)*100)/2
   }
 }

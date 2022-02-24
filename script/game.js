@@ -80,7 +80,11 @@ function Connect() {
 function ActivateTest(){
   fps_count = new FPSMeter({
     left: "auto",
-    right: screen.width/2+"px"
+    right: screen.width/2+"px",
+    maxFps: 75,
+    theme: "dark",
+    heat: ["red", "blue", "green"],
+    graph: 1
   });
   
   let sr = gx._screen_reference;

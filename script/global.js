@@ -9,7 +9,7 @@ mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
 mx.open = url => location.href = url;
 mx.Alert = txt=>app.Alert(txt);
-mx.debug_init = ()=>0//new Debugger("console").enable();
+mx.debug_init = ()=>new Debugger("console").enable();
 
 //evitar interacciones del usuario
 mx.CreateBlock = function(){

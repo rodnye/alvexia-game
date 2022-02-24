@@ -68,7 +68,7 @@ engine.socket = (socket)=> {
 
   // ACTUALIZAR PLAYER EN LA CAMARA //
   socket.on("del_pj", d=> {
-    console.log("ws del_pj>> "+d)
+    console.info("player removed >> "+d)
     try {
       delete gx.pjs[d]}
     catch(e) {
@@ -123,23 +123,26 @@ engine.socket = (socket)=> {
 }
 
 engine.world_add_player = d => {
-  console.log("player "+d.username+" added");
+  console.info("player "+d.username+" added");
   //alert(JSON.stringify(d))
   let stats = d.pjstats;
   let is_user = config.USER.name==d.username;
   let size  = stats.size.split("_");
   if(!is_user) gx.pjs[d.username] = {};
-  let player = is_user?gx.player:gx.pjs[d.username];
-    player.pos = [stats.pos.x, stats.pos.y];
-    player.mov = [0,0];
-    player.deg = stats.pos.angle;
-    player.size = [engine.tile(parseFloat(size[0])), engine.tile(parseFloat(size[1]))];
-    player.texture = stats.skin;
-    player.speed = stats.status.speed;
+  let pj = is_user?gx.player:gx.pjs[d.username];
+    pj.pos = [stats.pos.x, stats.pos.y];
+    pj.mov = [0,0];
+    pj.deg = stats.pos.angle;
+    pj.size = [engine.tile(parseFloat(size[0])), engine.tile(parseFloat(size[1]))];
+    pj.texture = stats.skin;
+    pj.speed = stats.status.speed;
   
-  player.img = new Image();
-  player.img.onload = ()=> {player.img.ready = true};
-  player.img.src = mx.BImg(config.PATH.img_pjs+"/"+player.texture);//+player.texture);
+  if(!pj.sprite) pj.sprite = new PIXI.Sprite(gx.src["pj_"+pj.texture].texture);
+  if(!pj.sprite_status) pj.sprite_status = new PIXI.Text(d.username, {
+    fontSize: 12,
+    textAlign: "center"
+  });
+  //else player.sprite.setTexture(gx.src["pj_"+player.texture].texture)
 }
 
 engine.world_add_obj = (d, pos)=>{
@@ -157,4 +160,8 @@ engine.world_add_obj = (d, pos)=>{
     engine.tile(parseFloat(size[0])),
     engine.tile(parseFloat(size[1]))
   ];
+  obj.sprite = new PIXI.Sprite(gx.src["w_"+obj.name].texture);
+  obj.sprite.width = cvw(obj.size[0]);
+  obj.sprite.height = cvw(obj.size[1]);
+  obj.sprite.zOrder = 2;
 }

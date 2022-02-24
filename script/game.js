@@ -22,27 +22,19 @@ function OnStart() {
   
   
   game_view = dom.get("#game-view");
-  tg_game_view = dom.get("canvas.tg-layer");
-  fg_game_view = dom.get("canvas.fg-layer");
-  bg_game_view = dom.get("canvas.bg-layer");
   joy = new JoyStick("joystick", {}, engine.joystick);
-  
   game_view.width = screen.width;
   game_view.height = screen.height;
-  tg_game_view.width = screen.width;
-  tg_game_view.height = screen.height;
-  fg_game_view.width = screen.width;
-  fg_game_view.height = screen.height;
-  bg_game_view.width = screen.width;
-  bg_game_view.height = screen.height;
   
-  //comprobar si tiene soporte
-  if (!fg_game_view.getContext) return app.Quit(raw.parse("CANVAS_ERROR"));
-
-  //inicializando api de canvas
-  tgame = tg_game_view.getContext("2d"); //capa superior
-  fgame = fg_game_view.getContext("2d"); //capa delantera
-  bgame = bg_game_view.getContext("2d"); //capa de fondo
+  // PIXI //
+  PIXI.utils.sayHello(PIXI.utils.isWebGLSupported()?"WebGL": "canvas");
+  game = new PIXI.Application({
+    width: screen.width,
+    height: screen.height
+  });
+  game.renderer.backgroundColor = 0xffffff;
+  game.sortableChildren = true;
+  game_view.dom.add(game.view);
   
   //obtener elementos del DOM
   btns = dom.getAll("button.btn-action-items");
@@ -52,8 +44,9 @@ function OnStart() {
   mx.Animate(0.3, () => app.SetScreenMode("Game")).start()
   
   if(config.TEST_ENABLE) ActivateTest()
-  engine.init();
-  Connect();
+  engine.init().ready(()=>{
+    Connect();
+  });
 }
 
 
@@ -97,5 +90,6 @@ function ActivateTest(){
   input_lupa.onchange = ()=>{
     gx._screen_reference = sr*(parseFloat(input_lupa.value)/100)*2;
     gx._paint_offset = pf*(parseFloat(input_lupa.value)*100)/2
+    console.warn("reference screen changed >> "+gx._screen_reference)
   }
 }

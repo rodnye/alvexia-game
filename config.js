@@ -23,7 +23,7 @@ config = {
       TEST_ENABLE: true
 }
 
-//function parseadora de string
+//function parseadora de string {{ }}
 function pp(c){
   let isObj = (v)=>(typeof v == "object" && !Array.isArray(v) && typeof v!=null);
   for(let i in c){

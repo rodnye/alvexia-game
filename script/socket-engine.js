@@ -1,11 +1,15 @@
 total_emit = 0;
 delay_emit = 0;
 delay_emit_count = 0;
+bytes_s = 0;
+bytes_r = 0;
+
 engine.socket = (socket)=> {
 
   // LOAD MAP //
   socket.on("load_map", d=> {
-    console.log("ws load_map")
+    console.log("ws load_map");
+    bytes_r += JSON.stringify(d).length;
     /* map = {
         name : WORDNAME,
         pos : {
@@ -45,6 +49,7 @@ engine.socket = (socket)=> {
 
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
   socket.on("new_pj", d=> {
+    bytes_r += JSON.stringify(d).length;
     //console.log("ws new_pj>> username:"+d.username)
     /*username,
       pjstats: {
@@ -68,6 +73,7 @@ engine.socket = (socket)=> {
 
   // ACTUALIZAR PLAYER EN LA CAMARA //
   socket.on("del_pj", d=> {
+    bytes_r += JSON.stringify(d).length;
     console.info("player removed >> "+d)
     try {
       delete gx.pjs[d]}
@@ -78,6 +84,7 @@ engine.socket = (socket)=> {
 
   // MOVER //
   socket.on("move_pj", d=> {
+    bytes_r += JSON.stringify(d).length;
     /* formato de datos
        0 => username
        1 => posx

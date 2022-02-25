@@ -102,7 +102,9 @@ engine.animation = ()=>{
   // EMITIR AL SERVIDOR //
   mx.Animate(gx._emitps, ()=>{
     if(player._emit_joy_enable){
-        socket.emit("move_pj", player.pos[0]+"&"+player.pos[1]+"&"+player.deg);
+        let emit_data = player.pos[0]+"&"+player.pos[1]+"&"+player.deg;
+        socket.emit("move_pj", emit_data);
+        bytes_s += emit_data.length;
         total_emit++;
     }
   }).start()
@@ -274,10 +276,15 @@ engine.generate_frame = () => {
       "world x: "+world.pos[0]+"\n"+
       "world y: "+world.pos[1]+"\n"+
       "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)"+"\n"+
-      "delay emits: "+delay_emit_count+"s"
+      "bytes enviados: "+Number(bytes_s/1024).toFixed(2)+"kb\n"+
+      "bytes recibidos: "+Number(bytes_r/1024).toFixed(2)+"kb"
     );
     fps_count.tick();
   }
+  if(!gx.zindexed) {
+    game.stage.sortChildren();
+    game.stage.sortableChildren = false;
+  } else gx.zindexed = true;
 }
 
 // IMAGENES CACHÉ //
@@ -319,7 +326,7 @@ engine.debug = txt=>{
     });
     gx.txt_debug.x = 5;
     gx.txt_debug.y = 5;
-    gx.txt_debug.zOrder = 100;
+    gx.txt_debug.zIndex = 100;
     game.stage.addChild(gx.txt_debug);
   }
   gx.txt_debug.text = txt

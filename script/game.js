@@ -33,7 +33,7 @@ function OnStart() {
     height: screen.height
   });
   game.renderer.backgroundColor = 0xffffff;
-  game.sortableChildren = true;
+  game.stage.sortableChildren = true;
   game_view.dom.add(game.view);
   
   //obtener elementos del DOM

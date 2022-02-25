@@ -1,6 +1,6 @@
 
 function OnStart(){
-   //configuracionea
+   //configuraciones
    app.SetOnShowKeyboard( OnKeyboard );
    app.SetOrientation( "Landscape" );
    app.SetScreenMode("Game");

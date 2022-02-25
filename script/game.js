@@ -10,6 +10,7 @@ app.Script(config.PATH.lib+"/fpsmeter.min.js");
 function OnStart() {
   mx.debug_init();
   app.SetScreenMode("Game");
+  app.Execute("ext.update_webview()")
   
   // USER STATUS //
   config.USER = {

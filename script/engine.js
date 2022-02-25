@@ -200,8 +200,8 @@ engine.generate_frame = () => {
  
   // DIBUJAR PLAYERS //
   for (let i in gx.pjs) if(gx.pjs[i]) {
+    let pj = gx.pjs[i];
     if(!gx.pjs[i].delete) {
-      let pj = gx.pjs[i];
       
       if(!pj.incanvas) {
         game.stage.addChild(pj.sprite);
@@ -234,7 +234,11 @@ engine.generate_frame = () => {
         }
     }
     else {
-      
+      //eliminar jugador
+      game.stage.removeChild(pj.sprite);
+      game.stage.removeChild(pj.sprite_status);
+      pj.sprite.destroy();
+      try {delete gx.pjs[i]} catch(e) {gx.pjs[i] = undefined;}
     }
   }
   
@@ -273,11 +277,10 @@ engine.generate_frame = () => {
       "player y: "+player.pos[1]+"\n"+
       "mov x: "+player.mov[0]+"\n"+
       "mov y: "+player.mov[1]+"\n"+
-      "world x: "+world.pos[0]+"\n"+
-      "world y: "+world.pos[1]+"\n"+
       "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)"+"\n"+
-      "bytes enviados: "+Number(bytes_s/1024).toFixed(2)+"kb\n"+
-      "bytes recibidos: "+Number(bytes_r/1024).toFixed(2)+"kb"
+      "bytes enviados: "+Number(bytes_s/1024).toFixed(2)+"KB\n"+
+      "bytes recibidos: "+Number(bytes_r/1024).toFixed(2)+"KB"+"\n"+
+      "total de bytes: "+Number((bytes_r+bytes_s)/1024/1024).toFixed(2)+"MB"
     );
     fps_count.tick();
   }

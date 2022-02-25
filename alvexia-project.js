@@ -1,4 +1,4 @@
-
+const ext = {};
 function OnStart(){
    //configuraciones
    app.SetOnShowKeyboard( OnKeyboard );
@@ -12,7 +12,13 @@ function OnStart(){
    
    //agregar
    parent.AddChild( viewApp );
-   app.AddLayout( parent )
+   app.AddLayout( parent );
+   
+   ext.update_webview = function(){
+       viewApp.SetTouchMode( false);
+       viewApp.Execute("console.warn('ext.update_webview')")
+       viewApp.SetTouchMode( true );
+   }
    
 }
 
@@ -26,4 +32,5 @@ function OnKeyboard(show){
   } else {
       viewApp.SetSize( 1, 1 );
   }
+  
 }

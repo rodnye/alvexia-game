@@ -75,11 +75,7 @@ engine.socket = (socket)=> {
   socket.on("del_pj", d=> {
     bytes_r += JSON.stringify(d).length;
     console.info("player removed >> "+d)
-    try {
-      delete gx.pjs[d]}
-    catch(e) {
-      gx.pjs[d] = undefined
-    }
+    gx.pjs[d].delete = true;
   });
 
   // MOVER //

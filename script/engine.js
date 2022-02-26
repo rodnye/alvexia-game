@@ -114,8 +114,8 @@ engine.animation = ()=>{
 engine.joystick = d => {
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
-    player.mov[0] = mx.round(d.x/100*player.speed);
-    player.mov[1] = mx.round(-d.y/100*player.speed);
+    player.mov[0] = d.x/100*player.speed;
+    player.mov[1] = -d.y/100*player.speed;
 }
 
 // CARGAR DATOS LOCALES DEL MUNDO //
@@ -170,18 +170,9 @@ engine.generate_frame = () => {
     world.incanvas = true
   }
   
-  /*if (world_img.floor.ready) 
-   for(let y = my; y < cvw(world.size[1]+world.pos[1]-2)+game_view.height/2; y+=cvw(world_img.floor.height)) {
-     if(y >= -gx._paint_offset)
-       for(let x = mx; x < cvw(world.size[0]+world.pos[0]-2)+game_view.width/2; x+=cvw(world_img.floor.width))
-         if(x >= -gx._paint_offset) bgame.drawImage(world_img.floor, x, y, cvw(world_img.floor.width), cvw(world_img.floor.height));
-   }*/
-  
   // DIBUJAR JUGADOR //
   if(!player.incanvas) {
     game.stage.addChild(player.sprite);
-    player.sprite.x = game_view.width/2-cvw(player.size[0])/2;
-    player.sprite.y = game_view.height/2-cvw(player.size[1])/2;
     player.incanvas = true;
   }
   player.sprite.width = cvw(player.size[0]);
@@ -189,15 +180,36 @@ engine.generate_frame = () => {
   
   let mx = cvw(world.pos[0]) + game_view.width/2;
   let my = cvw(world.pos[1]) + game_view.height/2;
+  let pX = 0; //player paint x
+  let pY = 0; //player paint y
+    
+    let maxValueCamX = -cvw(world.size[0]) + game_view.width;
+    let maxValueCamY = -cvw(world.size[1]) + game_view.height;
+    
+    //detener seguimiento de cámara en límite X
+    if(mx >= 0) {
+      mx = 0;
+      pX -= cvw(world.pos[0]);
+    } else if(mx <= maxValueCamX){
+      mx = maxValueCamX;
+      pX -= cvw(world.pos[0])-mx;
+    } else pX = game_view.width/2;
+    
+    //detener seguimiento de cámara en límite Y
+    if(my >= 0) {
+      my = 0;
+      pY -= cvw(world.pos[1]);
+    } else if(my <= maxValueCamY){
+      my = maxValueCamY;
+      pY -= cvw(world.pos[1])-my;
+    } else pY = game_view.height/2;
+    
+  // UBICAR MUNDO Y JUGADOR //
+  player.sprite.x = pX - cvw(player.size[0])/2;
+  player.sprite.y = pY - cvw(player.size[1])/2;
   world.sprite.tilePosition.x = mx;
   world.sprite.tilePosition.y = my;
   
-  /*
-  world.sprite.tilePosition.x = 
-  world.sprite.tilePosition.y = cvw(world.pos[1]) + game_view.height/2;
-  */
-  //if (player.img.ready) fgame.drawImage(player.img, game_view.width/2-cvw(player.size[0])/2, game_view.height/2-cvw(player.size[1])/2, cvw(player.size[0]), cvw(player.size[1]));
- 
   // DIBUJAR PLAYERS //
   for (let i in gx.pjs) if(gx.pjs[i]) {
     let pj = gx.pjs[i];
@@ -210,8 +222,8 @@ engine.generate_frame = () => {
       }
       
       let pos = [
-        cvw(pj.pos[0] + world.pos[0] - pj.size[0]/2)+game_view.width/2,
-        cvw(pj.pos[1] + world.pos[1] - pj.size[1]/2)+game_view.height/2
+        cvw(pj.pos[0] - pj.size[0]/2) + mx,
+        cvw(pj.pos[1] - pj.size[1]/2) + my
       ];
     
       //si está dentro del rango de visión
@@ -222,16 +234,21 @@ engine.generate_frame = () => {
         pos[1] <= game_view.height + gx._paint_offset
       ) {
           //dibujar letrero del player
+          pj.sprite_status.visible = true;
           pj.sprite_status.x = pos[0];
           pj.sprite_status.y = pos[1]-cvw(20);
           pj.sprite_status.width = cvw(pj.size[0]);
     
           //ubicar personaje
+          pj.sprite.visible = true;
           pj.sprite.x = pos[0];
           pj.sprite.y = pos[1];
           pj.sprite.width = cvw(pj.size[0]);
           pj.sprite.height = cvw(pj.size[1]);
-        }
+      } else {
+        pj.sprite.visible = false;
+        pj.sprite_status.visible = false;
+      }
     }
     else {
       //eliminar jugador
@@ -252,8 +269,8 @@ engine.generate_frame = () => {
     }
     
     let pos = [
-      cvw(obj.pos[0] + world.pos[0])+game_view.width/2,
-      cvw(obj.pos[1] + world.pos[1])+game_view.height/2
+      cvw(obj.pos[0]) + mx,
+      cvw(obj.pos[1]) + my
     ];
     
     //si está dentro del rango de visión
@@ -263,7 +280,7 @@ engine.generate_frame = () => {
       pos[1] >= -gx._paint_offset && 
       pos[1] <= game_view.height + gx._paint_offset
     ) {
-      if(!obj.sprite.visible) obj.sprite.visible = true;
+      obj.sprite.visible = true;
       obj.sprite.x = pos[0];
       obj.sprite.y = pos[1];
       obj.sprite.width = cvw(obj.size[0]);
@@ -273,10 +290,10 @@ engine.generate_frame = () => {
   
   if(config.TEST_ENABLE) {
     engine.debug(
-      "player x: "+player.pos[0]+"\n"+
-      "player y: "+player.pos[1]+"\n"+
-      "mov x: "+player.mov[0]+"\n"+
-      "mov y: "+player.mov[1]+"\n"+
+      "playerX: "+player.pos[0]+"\n"+
+      "playerY: "+player.pos[1]+"\n"+
+      "movX: "+player.mov[0]+"\n"+
+      "movY: "+player.mov[1]+"\n"+
       "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)"+"\n"+
       "bytes enviados: "+Number(bytes_s/1024).toFixed(2)+"KB\n"+
       "bytes recibidos: "+Number(bytes_r/1024).toFixed(2)+"KB"+"\n"+

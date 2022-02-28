@@ -1,6 +1,4 @@
 :root {
-  -webkit-user-select: none;
-  user-select: none;
   --color-background-main: #ffffff;
   --color-background-box: #eeeeee;
   --color-background-box-inactive: #aaaaaa;
@@ -15,7 +13,8 @@
 }
 
 body {
-   background: var(--color-background-main);
-   width: 100vw;
-   height: 100vh;
+  user-select: none;
+  background: var(--color-background-main);
+  width: 100vw;
+  height: 100vh;
 }

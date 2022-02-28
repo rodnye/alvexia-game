@@ -9,7 +9,8 @@ mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
 mx.open = url => location.href = url;
 mx.Alert = txt=>app.Alert(txt);
-mx.debug_init = ()=>new Debugger("console").enable();
+mx.debug_init = ()=>config.TEST_ENABLE?new Debugger("console").enable():0;
+mx.reload = ()=>app.Execute("ext.reloadUrl()");
 
 //evitar interacciones del usuario
 mx.CreateBlock = function(){
@@ -37,16 +38,36 @@ mx.CreateBlock = function(){
 //funcion para animaciones
 mx.Animate = function(_fps, callback){
     let _animation;
+    let _is_start = false;
+    let _requestRunning = false;
     return {
       start: function(){
-        if(_fps!="frame") _animation = window.setInterval(callback, 1000/_fps);
-        else {
-          _animation = ()=>{callback(); requestAnimationFrame(_animation)}
-          _animation();
+        if(!_is_start){
+          
+          //utilizando interval
+          if(typeof _fps=="number") _animation = window.setInterval(callback, 1000/_fps);
+          
+          //utilizando renderizador de PIXI
+          else if(_fps=="pixi") {
+            game.ticker.add(callback)
+          }
+          
+          //utilizando requestAnimationFrame
+          else if(_fps=="frame") {
+            _requestRunning = true;
+            _animation = ()=>{callback(); if(_requestRunning) requestAnimationFrame(_animation)}
+            _animation();
+          }
+          
+          else console.error(new Error("mx.Animate type " + _fps + " not found"));
         }
+        _is_start = true;
       },
       stop: function(){
-        if(_fps!="frame") window.clearInterval(_animation);
+        if (typeof _fps=="number") window.clearInterval(_animation);
+        else if(_fps == "pixi") game.ticker.remove(callback);
+        else if(_fps == "frame") _requestRunning = false;
+        _is_start = false;
       }
   }
 }
@@ -72,7 +93,7 @@ mx.round = function(num) {
 }
 
 dg = n=>{console.log(n);return n};
-cvw = ni=>screen.width*(n*100/720)/100;
+cvw = n=>screen.width*(n*100/720)/100;
 
 //parseador de status del server
 var raw;

@@ -5,7 +5,7 @@ config = {
       VERSION: "0.0.1",
 
       URL: {
-        server: "https://jewel-bottlenose-volleyball.glitch.me",
+        server: "https://alvexia-server.glitch.me",
         socket: "{{URL.server}}",
         auth: "{{URL.server}}" + "/auth/login",
         register: "{{URL.server}}" + "/auth/register",

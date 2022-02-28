@@ -1,16 +1,14 @@
 app.Script(config.PATH.lib+"/socket-io.min.js");
 app.Script(config.PATH.lib+"/joy.min.js");
+app.Script(config.PATH.lib+"/fpsmeter.min.js");
 app.Script(config.PATH.script+"/global.js");
-var engine = {};
 app.Script(config.PATH.script+"/engine.js");
 app.Script(config.PATH.script+"/socket-engine.js");
-app.Script(config.PATH.lib+"/fpsmeter.min.js");
 
 
 function OnStart() {
   mx.debug_init();
   app.SetScreenMode("Game");
-  app.Execute("ext.update_webview()")
   
   // USER STATUS //
   config.USER = {
@@ -33,8 +31,10 @@ function OnStart() {
     width: screen.width,
     height: screen.height
   });
-  game.renderer.backgroundColor = 0xffffff;
   game.stage.sortableChildren = true;
+  game.clearAll = ()=>{while(game.stage.children[0]) {
+    game.stage.removeChild(game.stage.children[0])
+  }};           
   game_view.dom.add(game.view);
   
   //obtener elementos del DOM

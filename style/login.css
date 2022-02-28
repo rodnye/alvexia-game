@@ -37,7 +37,6 @@ div.login-view {
     width: 100%;
     background: var(--color-background-main);
     height: 200px;
-    overflow: auto;
     
     display: none;
     flex-direction: column;
@@ -51,4 +50,8 @@ input.form, button.form {
    text-decoration: none;
    padding: 5px;
    text-align: center;
+}
+input.form {
+  width: 80%;
+  max-width: 200px;
 }

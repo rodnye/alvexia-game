@@ -7,18 +7,14 @@ function OnStart(){
    
    //elementos
    parent = app.CreateLayout( "Linear", "FillXY" );
-   viewApp = app.CreateWebView( 1, 1 );
+   viewApp = app.CreateWebView( 1, 1);
    viewApp.LoadUrl( "view-login.html" );
    
    //agregar
    parent.AddChild( viewApp );
    app.AddLayout( parent );
    
-   ext.update_webview = function(){
-       viewApp.SetTouchMode( false);
-       viewApp.Execute("console.warn('ext.update_webview')")
-       viewApp.SetTouchMode( true );
-   }
+   ext.reloadUrl = () => viewApp.Reload();
    
 }
 

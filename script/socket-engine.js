@@ -33,13 +33,14 @@ engine.socket = (socket)=> {
         npcs : {},
         pjs : {}
     } */
-    let world = gx.world;
-    world.size[0] = engine.tile(d.size.x);
-    world.size[1] = engine.tile(d.size.y);
-    world.pos[0] = d.pos.x;
-    world.pos[1] = d.pos.y;
+   let world = gx.world;
+    world.size.x = engine.tile(d.size.x);
+    world.size.y = engine.tile(d.size.y);
+    world.pos.x = d.pos.x;
+    world.pos.y = d.pos.y;
     world.biome = d.biome;
-    alert(JSON.stringify(d))
+    //console.log(d)
+    
     //cargar jugadores en el area
     for(let i in d.pjs) engine.world_add_player({username:i, pjstats:d.pjs[i]});
     
@@ -49,8 +50,7 @@ engine.socket = (socket)=> {
 
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
   socket.on("new_pj", d=> {
-    bytes_r += JSON.stringify(d).length;
-    //console.log("ws new_pj>> username:"+d.username)
+    bytes_r += JSON.stringify(d).replace(/\"/g, "").length;
     /*username,
       pjstats: {
         nickname,
@@ -75,7 +75,7 @@ engine.socket = (socket)=> {
   socket.on("del_pj", d=> {
     bytes_r += JSON.stringify(d).length;
     console.info("player removed >> "+d)
-    gx.pjs[d].delete = true;
+    if(gx.pjs[d]) gx.pjs[d].delete = true;
   });
 
   // MOVER //
@@ -93,78 +93,99 @@ engine.socket = (socket)=> {
     let y = parseFloat(d[2]);
     let a = parseFloat(d[3]);
     let is_user = config.USER.name == name;
-    let player = is_user? gx.player : gx.pjs[name];
+    let pj = is_user? gx.player : gx.pjs[name];
     
-    if(player.smooth) {
-      player.smooth.stop();
-      delete player.smooth;
+    if(pj.smooth) {
+      pj.smooth.stop();
+      delete pj.smooth;
     }
-    let deltaX = x - player.pos[0];
-    let deltaY = y - player.pos[1];
-    player.mov[0] = deltaX / gx._smooth_mov_steps;
-    player.mov[1] = deltaY / gx._smooth_mov_steps;
+    let deltaX = x - pj.pos.x;
+    let deltaY = y - pj.pos.y;
+    pj.mov.x = deltaX / gx._smooth_mov_steps;
+    pj.mov.y = deltaY / gx._smooth_mov_steps;
     
     let i = 0;
-    player.smooth = mx.Animate(gx._smooth_mov_fps, ()=>{
-      player.pos[0] += player.mov[0];
-      player.pos[1] += player.mov[1];
-      if(i >= gx._smooth_mov_steps) return player.smooth.stop();
+    pj.smooth = mx.Animate(gx._smooth_mov_fps, ()=>{
+      pj.pos.x += pj.mov.x;
+      pj.pos.y += pj.mov.y;
+      if(i >= gx._smooth_mov_steps) return pj.smooth.stop();
       i++
     });
-    player.smooth.start();
+    pj.smooth.start();
     
-    player.deg = a;
-    delay_emit -= Date.now();
-    delay_emit_count = -delay_emit/1000;
-    delay_emit = Date.now();
-    if (is_user) gx.world.pos = [
-      -x,
-      -y
-    ];
+    pj.deg = a;
+    if (is_user) {
+      gx.world.pos.x = -x;
+      gx.world.pos.y = -y;
+    }
   })
 
 }
 
 engine.world_add_player = d => {
   console.info("player "+d.username+" added");
-  //alert(JSON.stringify(d))
   let stats = d.pjstats;
   let is_user = config.USER.name==d.username;
   let size  = stats.size.split("_");
-  if(!is_user) gx.pjs[d.username] = {};
   let pj = is_user?gx.player:gx.pjs[d.username];
-    pj.pos = [stats.pos.x, stats.pos.y];
-    pj.mov = [0,0];
+  
+  if(!is_user) {
+    if(pj) {
+      game.stage.removeChild(pj.sprite);
+      game.stage.removeChild(pj.sprite_status);
+      pj.sprite.destroy();
+      pj.sprite_status.destroy();
+    }
+    gx.pjs[d.username] = {};
+  }
+    pj.size = {
+      x: engine.tile(parseFloat(size[0])), 
+      y: engine.tile(parseFloat(size[1]))
+    };
+    pj.pos = {
+      x: stats.pos.x,
+      y: stats.pos.y,
+      get z(){return (pj.pos.y + pj.size.y) / gx.world.size.y}
+    };
+    pj.mov = {x:0, y:0};
     pj.deg = stats.pos.angle;
-    pj.size = [engine.tile(parseFloat(size[0])), engine.tile(parseFloat(size[1]))];
     pj.texture = stats.skin;
     pj.speed = stats.status.speed;
   
-  if(!pj.sprite) pj.sprite = new PIXI.Sprite(gx.src["pj_"+pj.texture].texture);
-  if(!pj.sprite_status) pj.sprite_status = new PIXI.Text(d.username, {
-    fontSize: 12,
-    textAlign: "center"
-  });
-  //else player.sprite.setTexture(gx.src["pj_"+player.texture].texture)
+  if(!is_user){
+    if(!pj.sprite) pj.sprite = new PIXI.Sprite(gx.src["pj_"+pj.texture].texture);
+    if(!pj.sprite_status) pj.sprite_status = new PIXI.Text(d.username, {
+      fontSize: 12,
+      textAlign: "center"
+    });
+  }
 }
 
 engine.world_add_obj = (d, pos)=>{
   console.log("obj "+d.name+" added "+pos)
-  //6alert(JSON.stringify(d))
+  if(gx.obj[pos]){
+    game.stage.removeChild(gx.obj[pos].sprite);
+    gx.obj[pos].sprite.destroy();
+  }
+  
   gx.obj[pos] = d;
   const obj = gx.obj[pos];
-  pos = pos.split("_");
   let size = obj.size.split("_");
-  obj.pos = [
-    engine.tile(parseInt(pos[0])), 
-    engine.tile(parseInt(pos[1]))
-  ];
-  obj.size = [
-    engine.tile(parseFloat(size[0])),
-    engine.tile(parseFloat(size[1]))
-  ];
+      pos = pos.split("_");
+  
+  
+  obj.size = {
+    x: engine.tile(size[0]-0),
+    y: engine.tile(size[1]-0)
+  };
+  obj.pos = {
+    x: engine.tile(pos[0]-0), 
+    y: engine.tile(pos[1] - size[1] +1),
+    get z(){return (obj.pos.y + obj.size.y) / gx.world.size.y}
+  };
+  
   obj.sprite = new PIXI.Sprite(gx.src["w_"+obj.name].texture);
-  obj.sprite.width = cvw(obj.size[0]);
-  obj.sprite.height = cvw(obj.size[1]);
-  obj.sprite.zOrder = 2;
+  obj.sprite.width = cvw(obj.size.x);
+  obj.sprite.height = cvw(obj.size.y);
+  obj.sprite.zIndex = obj.pos.z;
 }

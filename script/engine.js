@@ -18,6 +18,7 @@ gx = {
   _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
 };
 
+engine = {};
 
 // INICIALIZAR JUEGO //
 engine.init = ()=> {
@@ -27,10 +28,14 @@ engine.init = ()=> {
   
   // PLAYER //
   gx.player = {
-    pos: [0,0],
+    pos: {
+      x: 0, 
+      y: 0,
+      get z(){return (gx.player.pos.y + gx.player.size.y) / gx.world.size.y}
+    },
     speed: 0,
-    mov: [0,0],
-    size: [40, 50],
+    mov: {x:0, y:0},
+    size: {x:40, y:50},
     deg: 0,
     texture: null,
     
@@ -39,8 +44,8 @@ engine.init = ()=> {
   
   // WORLD //
   gx.world = {
-    size: [0,0],
-    pos: [0,0],
+    size: {x:0, y:0},
+    pos: {x:0, y:0},
     bioma: "nature",
     textures: [],
     sprite: null
@@ -61,61 +66,73 @@ engine.animation = ()=>{
   var player = gx.player;
   
   // MOSTRAR //
-  game.ticker.add(engine.generate_frame);
+  if(gx.render) gx.render.stop()
+  else gx.render = mx.Animate("pixi", engine.generate_frame);
+  
   
   // LOGICA //
-  mx.Animate(gx._engine_fps, ()=>{
+  const logic = mx.Animate(gx._engine_fps, ()=>{
     if(config.USER.is_connect){
       
-      let p_cx = mx.round(player.pos[0] + (player.mov[0]>player.speed?player.speed:player.mov[0]));
-      let p_cy = mx.round(player.pos[1] + (player.mov[1]>player.speed?player.speed:player.mov[1]));
+      let p_cx = mx.round(player.pos.x + (player.mov.x>player.speed? player.speed:player.mov.x));
+      let p_cy = mx.round(player.pos.y + (player.mov.y>player.speed? player.speed:player.mov.y));
       
-      //no salirse del mapa
+      // COLISION BORDE DEL MAPA //
+      //x
       if( p_cx > 0 ) {
-        if (p_cx > world.size[0]) p_cx = world.size[0]// - player.size[0]/2;
+        if (p_cx > world.size.x) p_cx = world.size.x
       } else p_cx = 0;
-      
+      //y
       if( p_cy > 0 ) {
-        if (p_cy > world.size[1]) p_cy = world.size[1]//- player.size[1]/2;
+        if (p_cy > world.size.y) p_cy = world.size.y
       } else p_cy = 0;
       
       //AUN EN DESARROLLO
       //esta colisionando con algo?
-      /*const obj1 = gx.obj[engine.atile(p_cx - player.size[0]/2)+"_"+engine.atile(p_cy - player.size[1]/2)];
-      const obj2 = gx.obj[engine.atile(p_cx + player.size[0]/2)+"_"+engine.atile(p_cy + player.size[1]/2)]
-      if(obj1 || obj2){
-        let obj = obj1 || obj2;
-        let colision = engine.colision(player, obj, engine.direction(player.mov[0], player.mov[1]));
-        if(colision.t) p_cx = player.pos[0];
-        if(colision.t) p_cy = player.pos[1];
+      /*let obj1 = gx.obj[engine.atile(p_cx - player.size.x/2)+"_"+engine.atile(p_cy - player.size.y/2)];
+      let obj2 = gx.obj[engine.atile(p_cx + player.size.x/2)+"_"+engine.atile(p_cy + player.size.y/2)]
+      let obj3 = gx.obj[engine.atile(p_cx - player.size.x/2)+"_"+engine.atile(p_cy + player.size.y/2)]
+      let obj4 = gx.obj[engine.atile(p_cx + player.size.x/2)+"_"+engine.atile(p_cy - player.size.y/2)]
+      
+      let obj = obj1 || obj2 || obj3 || obj4;
+      if(obj){
+        let colision = engine.colision(player, obj);
+        if(colision.x) p_cx = player.pos.x;
+        if(colision.y) p_cy = player.pos.y;
       }*/
       
       
       //desplazar
-      player.pos[0] = p_cx;
-      player.pos[1] = p_cy;
-      gx.world.pos = [-player.pos[0],-player.pos[1]];
+      player.pos.x = p_cx;
+      player.pos.y = p_cy;
+      world.pos.x = -p_cx;
+      world.pos.y = -p_cy;
       
     }
-  }).start()
+  });
   
   // EMITIR AL SERVIDOR //
-  mx.Animate(gx._emitps, ()=>{
+  const emit = mx.Animate(gx._emitps, ()=>{
     if(player._emit_joy_enable){
-        let emit_data = player.pos[0]+"&"+player.pos[1]+"&"+player.deg;
+        let emit_data = player.pos.x + "&" + player.pos.y + "&" + player.deg;
         socket.emit("move_pj", emit_data);
         bytes_s += emit_data.length;
         total_emit++;
     }
-  }).start()
+  });
+  
+  //iniciar
+  logic.start();
+  emit.start();
+  gx.render.start();
 }
 
 // ACCIONES JOYSTICK //
 engine.joystick = d => {
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
-    player.mov[0] = d.x/100*player.speed;
-    player.mov[1] = -d.y/100*player.speed;
+    player.mov.x = d.x/100 * player.speed;
+    player.mov.y = -d.y/100 * player.speed;
 }
 
 // CARGAR DATOS LOCALES DEL MUNDO //
@@ -127,27 +144,27 @@ engine.load_textures = () => {
   const path_pj = config.PATH.img_pjs;
   
   // CARGAR TEXTURAS EN LA CACHÉ //
-  const loader = new engine.texture_loader();
-  loader.add("w_floor", mx.BImg(path_world+"/base"));
-  for (let i = 1; i <= 1; i++) loader.add("w_tree_"+i, mx.BImg(path_world+"/tree_"+i));
-  for (let i = 1; i <= 4; i++) loader.add("pj_hero_male_"+i, mx.BImg(path_pj+"/hero_male_"+i));
-  loader.load(()=>callback());
+  const cache = new engine.cache();
+  cache.add("w_floor", mx.BImg(path_world+"/base"));
+  for (let i = 1; i <= 1; i++) cache.add("w_tree_"+i, mx.BImg(path_world+"/tree_"+i));
+  for (let i = 1; i <= 1; i++) cache.add("pj_hero_male_"+i, mx.BImg(path_pj+"/hero_male_"+i));
+  cache.save(() => callback());
   
   return {ready: n=>{callback=n}}
 };
 
 // COLISION //
-engine.colision = (o1, o2, coord="N") => {
+engine.colision = (o1, o2) => {
   let res = {x:false , y:false};
   
-  if(/N|S/i.test(coord) &&
-     o1.pos[0] + o1.size[0] >= o2.pos[0] && //derecha o1
-     o1.pos[0] <= o2.pos[0] + o2.size[0]    //izquierda o1
+  if(
+     o1.pos.x + o1.size.x >= o2.pos.x && //derecha o1
+     o1.pos.x <= o2.pos.x + o2.size.x    //izquierda o1
   ) res.x = true;
   
-  if(/W|E/i.test(coord) &&
-     o1.pos[1] + o1.size[1] >= o2.pos[1] && //arriba o1
-     o1.pos[1] <= (o2.pos[1] + o2.size[1])  //abajo o1
+  if(
+     o1.pos.y + o1.size.y >= o2.pos.y && //arriba o1
+     o1.pos.y <= o2.pos.y + o2.size.y  //abajo o1
   ) res.y = true;
   
   res.t = res.x||res.y;
@@ -155,7 +172,7 @@ engine.colision = (o1, o2, coord="N") => {
 }
 
 // PINTAR FRAME //
-engine.generate_frame = () => {
+engine.generate_frame =  () => {
   if(config.TEST_ENABLE) fps_count.tickStart();
   let player = gx.player;
   let world = gx.world;
@@ -175,38 +192,39 @@ engine.generate_frame = () => {
     game.stage.addChild(player.sprite);
     player.incanvas = true;
   }
-  player.sprite.width = cvw(player.size[0]);
-  player.sprite.height = cvw(player.size[1]);
+  player.sprite.width = cvw(player.size.x);
+  player.sprite.height = cvw(player.size.y);
   
-  let mx = cvw(world.pos[0]) + game_view.width/2;
-  let my = cvw(world.pos[1]) + game_view.height/2;
+  let mx = cvw(world.pos.x) + game_view.width/2; //posicion mundo x
+  let my = cvw(world.pos.y) + game_view.height/2;//posicion mundo y
   let pX = 0; //player paint x
   let pY = 0; //player paint y
     
-    let maxValueCamX = -cvw(world.size[0]) + game_view.width;
-    let maxValueCamY = -cvw(world.size[1]) + game_view.height;
+    let maxValueCamX = -cvw(world.size.x) + game_view.width;
+    let maxValueCamY = -cvw(world.size.y) + game_view.height;
     
     //detener seguimiento de cámara en límite X
     if(mx >= 0) {
       mx = 0;
-      pX -= cvw(world.pos[0]);
+      pX -= cvw(world.pos.x);
     } else if(mx <= maxValueCamX){
       mx = maxValueCamX;
-      pX -= cvw(world.pos[0])-mx;
+      pX -= cvw(world.pos.x) - mx;
     } else pX = game_view.width/2;
     
     //detener seguimiento de cámara en límite Y
     if(my >= 0) {
       my = 0;
-      pY -= cvw(world.pos[1]);
+      pY -= cvw(world.pos.y);
     } else if(my <= maxValueCamY){
       my = maxValueCamY;
-      pY -= cvw(world.pos[1])-my;
+      pY -= cvw(world.pos.y) - my;
     } else pY = game_view.height/2;
     
   // UBICAR MUNDO Y JUGADOR //
-  player.sprite.x = pX - cvw(player.size[0])/2;
-  player.sprite.y = pY - cvw(player.size[1])/2;
+  player.sprite.x = pX - cvw(player.size.x)/2;
+  player.sprite.y = pY - cvw(player.size.y)/2;
+  player.sprite.zIndex = player.pos.z+1;
   world.sprite.tilePosition.x = mx;
   world.sprite.tilePosition.y = my;
   
@@ -221,30 +239,32 @@ engine.generate_frame = () => {
         pj.incanvas = true;
       }
       
-      let pos = [
-        cvw(pj.pos[0] - pj.size[0]/2) + mx,
-        cvw(pj.pos[1] - pj.size[1]/2) + my
-      ];
+      let pos = {
+        x: cvw(pj.pos.x - pj.size.x/2) + mx,
+        y: cvw(pj.pos.y - pj.size.y/2) + my
+      };
     
       //si está dentro del rango de visión
       if(
-        pos[0] >= -gx._paint_offset && 
-        pos[0] <= game_view.width + gx._paint_offset &&
-        pos[1] >= -gx._paint_offset && 
-        pos[1] <= game_view.height + gx._paint_offset
+        pos.x >= -gx._paint_offset && 
+        pos.x <= game_view.width + gx._paint_offset &&
+        pos.y >= -gx._paint_offset && 
+        pos.y <= game_view.height + gx._paint_offset
       ) {
           //dibujar letrero del player
           pj.sprite_status.visible = true;
-          pj.sprite_status.x = pos[0];
-          pj.sprite_status.y = pos[1]-cvw(20);
-          pj.sprite_status.width = cvw(pj.size[0]);
+          pj.sprite_status.x = pos.x;
+          pj.sprite_status.y = pos.y - cvw(20);
+          pj.sprite_status.zIndex = 5;
+          pj.sprite_status.width = cvw(pj.size.x);
     
           //ubicar personaje
           pj.sprite.visible = true;
-          pj.sprite.x = pos[0];
-          pj.sprite.y = pos[1];
-          pj.sprite.width = cvw(pj.size[0]);
-          pj.sprite.height = cvw(pj.size[1]);
+          pj.sprite.x = pos.x;
+          pj.sprite.y = pos.y;
+          pj.sprite.zIndex = pj.pos.z + 1;
+          pj.sprite.width = cvw(pj.size.x);
+          pj.sprite.height = cvw(pj.size.y);
       } else {
         pj.sprite.visible = false;
         pj.sprite_status.visible = false;
@@ -261,68 +281,72 @@ engine.generate_frame = () => {
   
   // DIBUJAR OBJETOS //
   for(let i in gx.obj ) {
-    let obj = gx.obj[i];
-    
+   let obj = gx.obj[i];
+   if(!obj.delete) {
     if(!obj.incanvas) {
       game.stage.addChild(obj.sprite);
       obj.incanvas = true;
     }
     
-    let pos = [
-      cvw(obj.pos[0]) + mx,
-      cvw(obj.pos[1]) + my
-    ];
+    let pos = {
+      x: cvw(obj.pos.x) + mx,
+      y: cvw(obj.pos.y) + my
+    };
     
     //si está dentro del rango de visión
     if(
-      pos[0] >= -gx._paint_offset && 
-      pos[0] <= game_view.width + gx._paint_offset &&
-      pos[1] >= -gx._paint_offset && 
-      pos[1] <= game_view.height + gx._paint_offset
+      pos.x >= -gx._paint_offset && 
+      pos.x <= game_view.width + gx._paint_offset &&
+      pos.y >= -gx._paint_offset && 
+      pos.y <= game_view.height + gx._paint_offset
     ) {
       obj.sprite.visible = true;
-      obj.sprite.x = pos[0];
-      obj.sprite.y = pos[1];
-      obj.sprite.width = cvw(obj.size[0]);
-      obj.sprite.height = cvw(obj.size[1]);
+      obj.sprite.x = pos.x;
+      obj.sprite.y = pos.y;
+      obj.sprite.zIndex = obj.pos.z + 1;
+      obj.sprite.width = cvw(obj.size.x);
+      obj.sprite.height = cvw(obj.size.y);
     } else if(obj.sprite.visible) obj.sprite.visible = false;
+   } 
+   else {
+     //eliminar objeto
+      game.stage.removeChild(obj.sprite);
+      obj.sprite.destroy();
+      try {delete gx.obj[i]} catch(e) {gx.obj[i] = undefined;}
+   }
   }
   
   if(config.TEST_ENABLE) {
     engine.debug(
-      "playerX: "+player.pos[0]+"\n"+
-      "playerY: "+player.pos[1]+"\n"+
-      "movX: "+player.mov[0]+"\n"+
-      "movY: "+player.mov[1]+"\n"+
-      "joy emits sent: "+total_emit+" ("+gx._emitps+"emit/s)"+"\n"+
-      "bytes enviados: "+Number(bytes_s/1024).toFixed(2)+"KB\n"+
-      "bytes recibidos: "+Number(bytes_r/1024).toFixed(2)+"KB"+"\n"+
-      "total de bytes: "+Number((bytes_r+bytes_s)/1024/1024).toFixed(2)+"MB"
+      "player=> x:" + player.pos.x + "/y:" + player.pos.y + "/z:"+player.pos.z.toFixed(2)+"\n"+
+      "mov=> x:" + player.mov.x.toFixed(2) + "/y:" + player.mov.y.toFixed(2) + "\n"+
+      "emits enviados: " + total_emit + " ("+gx._emitps+"emit/s)"+"\n"+
+      "bytes enviados: " + Number(bytes_s/1024).toFixed(2)+"KB\n"+
+      "bytes recibidos: " + Number(bytes_r/1024).toFixed(2)+"KB"+"\n"+
+      "total de bytes: " + Number((bytes_r+bytes_s)/1024/1024).toFixed(2)+"MB"
     );
     fps_count.tick();
   }
-  if(!gx.zindexed) {
-    game.stage.sortChildren();
-    game.stage.sortableChildren = false;
-  } else gx.zindexed = true;
+ game.stage.sortChildren();
 }
 
 // IMAGENES CACHÉ //
-engine.texture_loader = class {
+engine.cache = class {
   constructor(){
     this.list = [];
   }
   add(name, url){
     this.list.push({name:name, url:url});
   }
-  load(callback){
+  save(callback){
+    callback = callback || function(){};
     return game.loader.add(this.list).load(callback)
   }
 }
 
 // CONVERSOR DE TILES //
 engine.tile = n=> n * gx._tile_size;
-engine.atile = n=> Math.floor(n/gx._tile_size);
+engine.atile = n=> Math.floor(n / gx._tile_size);
 
 // DIRECCION //
 engine.direction = (x, y) => {
@@ -338,8 +362,9 @@ engine.direction = (x, y) => {
         225<=deg && deg<315? "S" : "E" 
 }
 
+
 // DEBUG CANVAS //
-engine.debug = txt=>{
+engine.debug = async txt => {
   if(!gx.txt_debug) {
     gx.txt_debug = new PIXI.Text("", {
       fontSize: 10

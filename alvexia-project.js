@@ -14,7 +14,7 @@ function OnStart(){
    parent.AddChild( viewApp );
    app.AddLayout( parent );
    
-   ext.reloadUrl = () => viewApp.Reload();
+   ext.reload_url = () => viewApp.Reload();
    
 }
 

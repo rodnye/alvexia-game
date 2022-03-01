@@ -106,23 +106,21 @@ function ActivateTest(){
   dev.add(input_lupa);
   
   // OCULTAR STATUS //
-  let _visible_status_box = true;
-  dev.add_button("Ocultar estado", ()=>{
-    dom.get("div.status-box").style.display = !_visible_status_box?"flex":"none";
-    _visible_status_box = !_visible_status_box;
+  dev.add_toggle("Ocultar estado", false, on => {
+    dom.get("div.status-box").style.display = !on?"flex":"none";
   });
   
   // DESACTIVAR COLISIONES //
-  dev.add_button("Ignorar colisiones", ()=>{
-    gx._colision_enable = !gx._colision_enable;
-    console.warn("colision >> "+(gx._colision_enable?"enable":"disable"))
+  dev.add_toggle("Ignorar colisiones", false, on => {
+    gx._colision_enable = !on;
+    console.warn("colision >> "+(!on?"enable":"disable"))
   });
   
   // LOGIN //
   dev.add_button("Abrir login", ()=>mx.open("view-login.html"))
   
   // RECONECTAR //
-  dev.add_button("Reconectar", ()=>app.Execute("ext.reloadUrl()"))
+  dev.add_button("Reconectar", ()=>app.Execute("ext.reload_url()"))
   
   // SALIR //
   dev.add_button("Exit App", ()=>app.Exit(true));

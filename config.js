@@ -20,7 +20,7 @@ config = {
         script: "./script",
         data: "/sdcard/Android/data/"+"{{PACKAGE}}",
       },
-      TEST_ENABLE: true
+      TEST_ENABLE: app.InIDE(),
 }
 
 //function parseadora de string {{ }}

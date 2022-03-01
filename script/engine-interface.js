@@ -96,6 +96,7 @@ interface.debug = class {
     this.float_box = float_box;
   }
   
+  /* BUTTON */
   add_button(name, action) {
     let button = dom.create("button");
     button.dom.on("click", action);
@@ -110,7 +111,34 @@ interface.debug = class {
       width: "80%",
     })
     this.float_box.dom.add(button);
+    return button;
   }
+  
+  /* TOGGLE */
+  add_toggle(name, on=true, action) {
+    let icon = dom.create("i");
+    update_toggle(on);
+    let button = this.add_button(name, ()=>{
+      update_toggle(!on);
+      action(on)
+    });
+    
+    button.dom.style({
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    });
+    button.insertBefore(icon, button.childNodes[0]);
+    
+    function update_toggle(b){
+      on = b;
+      icon.dom.set("class", "fa fa-toggle-"+(on?"on":"off"))
+    }
+    
+    return button;
+  }
+  
+  /* AÑADIR ELEMENTO PERSONALIZADO */
   add(element){
     this.float_box.dom.add(element);
   }

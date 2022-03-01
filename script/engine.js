@@ -106,8 +106,8 @@ engine.animation = ()=>{
      if(gx._colision_enable) {
       let _player = {
         pos: {
-          x: player.pos.x - player.size.x/2,
-          y: player.pos.y - player.size.y/2,
+          x: p_cx - player.size.x/2,
+          y: p_cy - player.size.y/2,
         },
         size: player.size
       }
@@ -115,7 +115,10 @@ engine.animation = ()=>{
       for(let i in gx.obj_colision){
         let obj = gx.obj_colision[i];
         let colision = engine.colision(_player, obj);
-        if(colision.t) return 0;
+        if(obj.type === 0 ){
+          if(colision.x) p_cx = player.pos.x;
+          if(colision.y) p_cy = player.pos.y;
+        }
       }
      }
       
@@ -131,7 +134,10 @@ engine.animation = ()=>{
   // EMITIR AL SERVIDOR //
   const emit = mx.Animate(gx._emitps, ()=>{
     if(player._emit_joy_enable){
-        let emit_data = player.pos.x + "&" + player.pos.y + "&" + player.deg;
+        let emit_data = 
+          player.pos.x.toFixed(2)+"&" + 
+          player.pos.y.toFixed(2)+"&" + 
+          player.deg;
         socket.emit("move_pj", emit_data);
         bytes_s += emit_data.length;
         total_emit++;
@@ -171,21 +177,32 @@ engine.load_textures = () => {
 };
 
 // COLISION //
-engine.colision = (o1, o2) => {
+engine.colision = (oo1, oo2) => {
   let res = {x:false , y:false};
+  
+  let o1 = {
+    pos: oo1.coll_min??oo1.pos,
+    size: oo1.coll_max??oo1.size
+  }
+  let o2 = {
+    pos: oo2.coll_min??oo2.pos,
+    size: oo2.coll_max??oo2.size
+  }
   
   if(
      o1.pos.x + o1.size.x >= o2.pos.x && //derecha o1
-     o1.pos.x <= o2.pos.x + o2.size.x    //izquierda o1
-  ) res.x = true;
-  
-  if(
+     o1.pos.x <= o2.pos.x + o2.size.x &&   //izquierda o1
      o1.pos.y + o1.size.y >= o2.pos.y && //arriba o1
      o1.pos.y <= o2.pos.y + o2.size.y  //abajo o1
-  ) res.y = true;
+  ) {
+     if(m(o1.pos.x - o2.pos.x) >= m(o1.pos.y - o2.pos.y)) res.x = true;
+     else res.y = true;
+  }
   
-  res.t = res.x && res.y;
+  res.t = res.x || res.y;
   return res;
+  
+  function m(n){return n<0?-n:n}
 }
 
 // PINTAR FRAME //

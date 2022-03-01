@@ -1,9 +1,14 @@
+engine = {};
+interface = {};
+
+
 app.Script(config.PATH.lib+"/socket-io.min.js");
 app.Script(config.PATH.lib+"/joy.min.js");
 app.Script(config.PATH.lib+"/fpsmeter.min.js");
 app.Script(config.PATH.script+"/global.js");
 app.Script(config.PATH.script+"/engine.js");
-app.Script(config.PATH.script+"/socket-engine.js");
+app.Script(config.PATH.script+"/engine-socket.js");
+app.Script(config.PATH.script+"/engine-interface.js");
 
 
 function OnStart() {
@@ -32,9 +37,6 @@ function OnStart() {
     height: screen.height
   });
   game.stage.sortableChildren = true;
-  game.clearAll = ()=>{while(game.stage.children[0]) {
-    game.stage.removeChild(game.stage.children[0])
-  }};           
   game_view.dom.add(game.view);
   
   //obtener elementos del DOM
@@ -88,13 +90,40 @@ function ActivateTest(){
     graph: 1
   });
   
+  const dev = new interface.debug();
+  
+  // LUPA //
   let sr = gx._screen_reference;
   let pf = gx._paint_offset;
-  input_lupa = dom.get("#lupa");
-  input_lupa.style.display = "inline";
-  input_lupa.onchange = ()=>{
+  input_lupa = dom.create("input");
+  input_lupa.dom.set("type", "range");
+  input_lupa.dom.set("value", "50");
+  input_lupa.onchange = () => {
     gx._screen_reference = sr*(parseFloat(input_lupa.value)/100)*2;
     gx._paint_offset = pf*(parseFloat(input_lupa.value)*100)/2
     console.warn("reference screen changed >> "+gx._screen_reference)
   }
+  dev.add(input_lupa);
+  
+  // OCULTAR STATUS //
+  let _visible_status_box = true;
+  dev.add_button("Ocultar estado", ()=>{
+    dom.get("div.status-box").style.display = !_visible_status_box?"flex":"none";
+    _visible_status_box = !_visible_status_box;
+  });
+  
+  // DESACTIVAR COLISIONES //
+  dev.add_button("Ignorar colisiones", ()=>{
+    gx._colision_enable = !gx._colision_enable;
+    console.warn("colision >> "+(gx._colision_enable?"enable":"disable"))
+  });
+  
+  // LOGIN //
+  dev.add_button("Abrir login", ()=>mx.open("view-login.html"))
+  
+  // RECONECTAR //
+  dev.add_button("Reconectar", ()=>app.Execute("ext.reloadUrl()"))
+  
+  // SALIR //
+  dev.add_button("Exit App", ()=>app.Exit(true));
 }

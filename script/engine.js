@@ -6,6 +6,7 @@ gx = {
   pjs: {},
   obj: {},
   cache: PIXI.utils.TextureCache,
+  obj_colision: {},
   get src(){return game.loader.resources},
   
   /* atributos editables */
@@ -16,6 +17,7 @@ gx = {
   _engine_fps: 30,  //cuadros por segundo
   _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
   _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
+  _colision_enable: true,
 };
 
 engine = {};
@@ -36,6 +38,18 @@ engine.init = ()=> {
     speed: 0,
     mov: {x:0, y:0},
     size: {x:40, y:50},
+    status: {
+      level: 0,
+      hp: 0,
+      mp: 0,
+      xp: 0,
+      hp_max: 0,
+      mp_max: 0,
+      xp_max: 0,
+      get $hp(){return gx.player.status.hp / gx.player.status.hp_max * 100},
+      get $mp(){return gx.player.status.mp / gx.player.status.mp_max * 100},
+      get $xp(){return gx.player.status.xp / gx.player.status.xp_max * 100}
+    },
     deg: 0,
     texture: null,
     
@@ -87,20 +101,23 @@ engine.animation = ()=>{
         if (p_cy > world.size.y) p_cy = world.size.y
       } else p_cy = 0;
       
-      //AUN EN DESARROLLO
-      //esta colisionando con algo?
-      /*let obj1 = gx.obj[engine.atile(p_cx - player.size.x/2)+"_"+engine.atile(p_cy - player.size.y/2)];
-      let obj2 = gx.obj[engine.atile(p_cx + player.size.x/2)+"_"+engine.atile(p_cy + player.size.y/2)]
-      let obj3 = gx.obj[engine.atile(p_cx - player.size.x/2)+"_"+engine.atile(p_cy + player.size.y/2)]
-      let obj4 = gx.obj[engine.atile(p_cx + player.size.x/2)+"_"+engine.atile(p_cy - player.size.y/2)]
+     //AUN EN DESARROLLO
+     //esta colisionando con algo?
+     if(gx._colision_enable) {
+      let _player = {
+        pos: {
+          x: player.pos.x - player.size.x/2,
+          y: player.pos.y - player.size.y/2,
+        },
+        size: player.size
+      }
       
-      let obj = obj1 || obj2 || obj3 || obj4;
-      if(obj){
-        let colision = engine.colision(player, obj);
-        if(colision.x) p_cx = player.pos.x;
-        if(colision.y) p_cy = player.pos.y;
-      }*/
-      
+      for(let i in gx.obj_colision){
+        let obj = gx.obj_colision[i];
+        let colision = engine.colision(_player, obj);
+        if(colision.t) return 0;
+      }
+     }
       
       //desplazar
       player.pos.x = p_cx;
@@ -167,7 +184,7 @@ engine.colision = (o1, o2) => {
      o1.pos.y <= o2.pos.y + o2.size.y  //abajo o1
   ) res.y = true;
   
-  res.t = res.x||res.y;
+  res.t = res.x && res.y;
   return res;
 }
 
@@ -306,7 +323,11 @@ engine.generate_frame =  () => {
       obj.sprite.zIndex = obj.pos.z + 1;
       obj.sprite.width = cvw(obj.size.x);
       obj.sprite.height = cvw(obj.size.y);
-    } else if(obj.sprite.visible) obj.sprite.visible = false;
+      gx.obj_colision[i] = obj;
+    } else if(obj.sprite.visible) {
+      obj.sprite.visible = false;
+      delete gx.obj_colision[i];
+    }
    } 
    else {
      //eliminar objeto

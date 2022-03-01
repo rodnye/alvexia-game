@@ -1,4 +1,6 @@
-/* CANVAS */
+  /*********************/
+ /*****  CANVAS   *****/
+/*********************/
 #game-view {
   position: fixed;
   top: 0;
@@ -13,17 +15,10 @@
   left: 0;
   background-color: rgba(0,0,0,0);
 }
-canvas.tg-layer {
-  z-index: 2;
-}
-canvas.fg-layer {
-  z-index: 1;
-}
-canvas.bg-layer {
-  z-index: 0;
-}
 
-/* CONTROLES */
+  /*********************/
+ /***** CONTROLES *****/
+/*********************/
 #joystick {
   position: absolute;
   bottom: 10px;
@@ -65,20 +60,107 @@ div.row-action-container {
 #btn-action-primary {
   background: #ff0000;
   border-radius: 500px;
-  width: 80px;
-  height: 80px;
+  border:none;
+  width: 15vh;
+  height: 15vh;
 }
 button.btn-action-items {
-  width: 60px;
-  height: 60px;
+  width: 10vh;
+  height: 10vh;
+  border: none;
+  margin: 2px;
   background: blue;
 }
 
-/* OPCIONES DE TESTEO */
-#lupa {
-  display: none;
+  /*********************/
+ /***** INTERFAZ  *****/
+/*********************/
+
+/* Caja superior izquierda */
+div.status-box {
+  display: flex;
   position: fixed;
-  top: 0;
-  right: 0;
-  background: #ffffff;
+  top: 5px;
+  left: 5px;
+  
+  flex-direction: row;
+  width: 150px;
+  padding: 5px;
+  
+  background: linear-gradient(45deg, #666666, #aaaaaa);
+  border-radius: 10px;
+  border: solid 4px;
 }
+  /*lado izquierdo*/
+  div.profile-status-box {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    border-right: solid;
+  }
+  div.profile-status-box > img {
+    height: 100%;
+    border: none;
+  }
+  div.level-status {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0 2px;
+    font-size: 10px;
+    font-family: Monospace;
+    
+    background: rgba(0,0,0,0.6);
+    color: #ffffff;
+  }
+  
+  /* lado derecho */
+  div.status-status-box {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  div.name-status {
+    text-align: center;
+    font-size: 14px;
+  }
+  div.hp-container {
+    display: flex;
+    flex-direction: row;
+    border-radius: 100px;
+    border: solid;
+  }
+  div.hp-bar {
+    height: 10px;
+    width: 100%;
+    border-radius: 100px;
+  }
+  #hp-bar {
+    background: red;
+  }
+  #mp-bar {
+    background: blue;
+  }
+  #xp-bar {
+    background: yellow;
+    height: 5px;
+  }
+
+/* Caja superior derecha */
+#map {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  width: 30vh;
+  height: 30vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0, 0.5);
+}
+
+
+/* OPCIONES DE TESTEO */

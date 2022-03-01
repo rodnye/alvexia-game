@@ -7,7 +7,7 @@ bytes_r = 0;
 engine.socket = (socket)=> {
 
   // LOAD MAP //
-  socket.on("load_map", d=> {
+  socket.on("load_map", d => {
     console.log("ws load_map");
     bytes_r += JSON.stringify(d).length;
     /* map = {
@@ -63,6 +63,7 @@ engine.socket = (socket)=> {
             c_hp,
             c_mp,
         }
+        skin,
         pos: {x,y,angle}
         size: {x,y}
       }
@@ -136,7 +137,8 @@ engine.world_add_player = d => {
       pj.sprite.destroy();
       pj.sprite_status.destroy();
     }
-    gx.pjs[d.username] = {};
+    gx.pjs[d.username] = {status:{}};
+    pj = gx.pjs[d.username];
   }
     pj.size = {
       x: engine.tile(parseFloat(size[0])), 
@@ -151,6 +153,14 @@ engine.world_add_player = d => {
     pj.deg = stats.pos.angle;
     pj.texture = stats.skin;
     pj.speed = stats.status.speed;
+    
+    pj.status.hp = stats.status.c_hp;
+    pj.status.level = stats.status.level;
+    pj.status.xp = stats.status.c_xp;
+    pj.status.mp = stats.status.c_mp;
+    pj.status.hp_max = stats.status.hp;
+    pj.status.xp_max = stats.status.xp;
+    pj.status.mp_max = stats.status.mp;
   
   if(!is_user){
     if(!pj.sprite) pj.sprite = new PIXI.Sprite(gx.src["pj_"+pj.texture].texture);
@@ -158,6 +168,16 @@ engine.world_add_player = d => {
       fontSize: 12,
       textAlign: "center"
     });
+  }
+  else {
+    interface.player_status.level = pj.status.level;
+    interface.player_status.bars = {
+      hp: pj.status.$hp,
+      mp: pj.status.$mp,
+      xp: pj.status.$xp,
+    };
+    interface.player_status.name = config.USER.name;
+    interface.player_status.img = mx.BImg(config.PATH.img_pjs+"/" + pj.texture);
   }
 }
 

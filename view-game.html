@@ -7,6 +7,7 @@
     <script src='file:///android_asset/app.js'></script>
     <script src='./Html/pixi.min.js'></script>
     <!--source-->
+    <link rel="stylesheet" href="file:///android_asset/edit/font-awesome/css/all.min.css"></link>
     <link rel="stylesheet" href="./style/global.css"></link>
     <script src="config.js"></script>
     
@@ -18,6 +19,32 @@
   
   <div id=game-view></div>
 	<div id=joystick></div>
+	
+	<!-- Caja superior izquierda -->
+	<div class=status-box>
+	  <div class=profile-status-box>
+	    <img src="/f"/>
+	    <div class=level-status>0</div>
+	  </div>
+	  
+	  <div class=status-status-box>
+	    <div class=name-status> Alguien </div>
+	    <div class=hp-container>
+	      <div class=hp-bar id=hp-bar></div>
+	    </div>
+	    <div class=hp-container>
+	      <div class=hp-bar id=mp-bar></div>
+	    </div>
+	    <div class=hp-container>
+	      <div class=hp-bar id=xp-bar></div>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- Minimapa -->
+	<div id=map>
+	  Minimapa
+	</div>
 	
 	<div id=action-container>
 	   <div class=action-container-top>
@@ -41,6 +68,5 @@
 	     </div>
 	   </div>
 	</div>
-	<input type=range id=lupa value=50/>
 </body>
 </html>

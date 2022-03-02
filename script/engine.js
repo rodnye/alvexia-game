@@ -17,10 +17,12 @@ gx = {
   _engine_fps: 30,  //cuadros por segundo
   _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
   _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
+
   _colision_enable: true,
+  _colision_axis: true,
+  _colision_center: true,
 };
 
-engine = {};
 
 // INICIALIZAR JUEGO //
 engine.init = ()=> {
@@ -106,18 +108,18 @@ engine.animation = ()=>{
      if(gx._colision_enable) {
       let _player = {
         pos: {
-          x: p_cx - player.size.x/2,
-          y: p_cy - player.size.y/2,
+          x: p_cx - (!gx._colision_center?player.size.x/2:0),
+          y: p_cy - (!gx._colision_center?player.size.y/2:0),
         },
-        size: player.size
+        size: gx._colision_center?{x:0,y:0}:player.size
       }
       
       for(let i in gx.obj_colision){
         let obj = gx.obj_colision[i];
         let colision = engine.colision(_player, obj);
         if(obj.type === 0 ){
-          if(colision.x) p_cx = player.pos.x;
-          if(colision.y) p_cy = player.pos.y;
+            if(colision.x || (colision.t && gx._colision_axis)) p_cx = player.pos.x;
+          if(colision.y || (colision.t && gx._colision_axis)) p_cy = player.pos.y;
         }
       }
      }
@@ -181,12 +183,12 @@ engine.colision = (oo1, oo2) => {
   let res = {x:false , y:false};
   
   let o1 = {
-    pos: oo1.coll_min??oo1.pos,
-    size: oo1.coll_max??oo1.size
+    pos: oo1.coll_min!==undefined? oo1.coll_min : oo1.pos,
+    size: oo1.coll_max!==undefined? oo1.coll_max : oo1.size,
   }
   let o2 = {
-    pos: oo2.coll_min??oo2.pos,
-    size: oo2.coll_max??oo2.size
+    pos: oo2.coll_min!==undefined? oo2.coll_min : oo2.pos,
+    size: oo2.coll_max!==undefined? oo2.coll_max : oo2.size,
   }
   
   if(

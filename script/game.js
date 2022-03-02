@@ -1,4 +1,5 @@
 engine = {};
+gx = {};
 interface = {};
 
 
@@ -112,12 +113,22 @@ function ActivateTest(){
   
   // DESACTIVAR COLISIONES //
   dev.add_toggle("Ignorar colisiones", false, on => {
-    gx._colision_enable = !on;
-    console.warn("colision >> "+(!on?"enable":"disable"))
+    gx._colision_enable = !gx._colision_enable;
+    console.warn("colision >> "+(gx._colision_enable?"enable":"disable"))
   });
   
+  // COLISION TOTAL //
+  dev.add_toggle("Colision sin eje", true, on=>{
+    gx._colision_axis = !gx._colision_axis;
+  });
+  
+  //FORMA DE COLISION PLAYER
+  dev.add_toggle("Colision cuadrada", false, ()=>{
+    gx._colision_center = !gx._colision_center;
+  })
+  
   // LOGIN //
-  dev.add_button("Abrir login", ()=>mx.open("view-login.html"))
+  dev.add_button("Ir a login", ()=>mx.open("view-login.html"))
   
   // RECONECTAR //
   dev.add_button("Reconectar", ()=>app.Execute("ext.reload_url()"))

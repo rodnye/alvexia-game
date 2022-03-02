@@ -121,7 +121,7 @@ raw.add("ACC_ERROR",         "Los datos de la cuenta tienen un error");
 raw.add("EMPTY_USER",        "El usuario no puede estar en blanco");
 raw.add("EMPTY_PASS",        "La contraseña no puede estar vacía");
 raw.add("EMPTY_MAIL",       "El email no puede estar vacío");
-raw.add("EMAIL_USED",        "El email introducido ya se encuentra en uso");
+raw.add("MAIL_USED",        "El email introducido ya se encuentra en uso");
 raw.add("PASS_MATH",         "Las contraseñas no coinciden");
 raw.add("PASS_LENGTH",       "La contraseña debe estar en el rango de 8 a 15 letras");
 raw.add("SUCCESS",           "Operación efectuada correctamente");

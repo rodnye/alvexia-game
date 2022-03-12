@@ -160,9 +160,18 @@ engine.animation = function(){
   });
   
   //iniciar
-  logic.start();
-  emit.start();
-  gx.render.start();
+  return {
+    start: function(){
+      logic.start();
+      emit.start();
+      gx.render.start();
+    },
+    stop: function(){
+      logic.stop();
+      emit.stop();
+      gx.render.stop();
+    }
+  }
 }
 
 // ACCIONES JOYSTICK //
@@ -252,8 +261,9 @@ engine.generate_frame =  function(){
     //animación movimiento
     if(player.mov.x || player.mov.y) {
       player.mov_sprite.time++;
-      if(!(player.mov_sprite.time%6)) player.mov_sprite.texture++;
-      if(player.mov_sprite.texture > 3) player.mov_sprite.texture = 0;
+      let mvl = Math.round(Math.max(Math.abs(player.mov.x), Math.abs(player.mov.y))*2);
+      if(!( player.mov_sprite.time%(15-mvl))) player.mov_sprite.texture++;
+      if(player.mov_sprite.texture > 3) player.mov_sprite.texture = 1;
       if(player.deg>90 && player.deg<=270) {
         player.sprite.scale.x = -1;
         player.mov_sprite.x = cvw(player.size.x);
@@ -261,7 +271,10 @@ engine.generate_frame =  function(){
         player.sprite.scale.x = 1;
         player.mov_sprite.x = 0;
       }
-    } else player.mov_sprite.texture = 0;
+    } else {
+      player.mov_sprite.texture = 0;
+      player.mov_sprite.time = 0;
+    }
     
     if(player.mov_sprite.texture) player.sprite.texture = gx.src["pj_"+player.texture+"_m"+player.mov_sprite.texture].texture;
     else player.sprite.texture = gx.src["pj_"+player.texture].texture;
@@ -331,10 +344,31 @@ engine.generate_frame =  function(){
           pj.sprite_status.y = pos.y - cvw(20);
           pj.sprite_status.zIndex = 5;
           pj.sprite_status.width = cvw(pj.size.x);
-    
+          
+          //animación
+          if(pj.mov.x || pj.mov.y) {
+            pj.mov_sprite.time++;
+            let mvl = Math.round(Math.max(Math.abs(pj.mov.x), Math.abs(pj.mov.y))*2);
+            if(!( pj.mov_sprite.time%(15-mvl))) pj.mov_sprite.texture++;
+            if(pj.mov_sprite.texture > 3) pj.mov_sprite.texture = 1;
+            if(pj.deg>90 && pj.deg<=270) {
+              pj.sprite.scale.x = -1;
+              pj.mov_sprite.x = cvw(pj.size.x);
+            } else {
+              pj.sprite.scale.x = 1;
+              pj.mov_sprite.x = 0;
+            }
+          } else {
+            pj.mov_sprite.texture = 0;
+            pj.mov_sprite.time = 0;
+          }
+          if (pj.mov_sprite.texture) pj.sprite.texture = gx.src["pj_"+pj.texture+"_m"+pj.mov_sprite.texture].texture;
+          else pj.sprite.texture = gx.src["pj_"+pj.texture].texture;
+  
+          
           //ubicar personaje
           pj.sprite.visible = true;
-          pj.sprite.x = pos.x;
+          pj.sprite.x = pos.x + pj.mov_sprite.x;
           pj.sprite.y = pos.y;
           pj.sprite.zIndex = pj.pos.z + 1;
           pj.sprite.width = cvw(pj.size.x);

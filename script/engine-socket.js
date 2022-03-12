@@ -47,7 +47,8 @@ engine.socket = (socket)=> {
     //cargar objetos en memoria
     for( let i in d.objects) engine.world_add_obj(d.objects[i], i);
     
-    engine.animation()
+    if(!gx._animation) gx._animation = engine.animation();
+    gx._animation.start();
   });
 
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
@@ -98,6 +99,7 @@ engine.socket = (socket)=> {
     let is_user = config.USER.name == name;
     let pj = is_user? gx.player : gx.pjs[name];
     
+    //suavisado
     if(pj.smooth) {
       pj.smooth.stop();
       delete pj.smooth;
@@ -111,7 +113,11 @@ engine.socket = (socket)=> {
     pj.smooth = mx.Animate(gx._smooth_mov_fps, ()=>{
       pj.pos.x += pj.mov.x;
       pj.pos.y += pj.mov.y;
-      if(i >= gx._smooth_mov_steps) return pj.smooth.stop();
+      if(i >= gx._smooth_mov_steps) {
+        pj.mov.x = 0;
+        pj.mov.y = 0;
+        return pj.smooth.stop();
+      }
       i++
     });
     pj.smooth.start();
@@ -163,6 +169,12 @@ engine.world_add_player = d => {
     pj.status.hp_max = stats.status.hp;
     pj.status.xp_max = stats.status.xp;
     pj.status.mp_max = stats.status.mp;
+    
+    pj.mov_sprite = {
+      texture: 0,
+      time: 0,
+      x: 0
+    }
   
   if(!is_user){
     if(!pj.sprite) pj.sprite = new PIXI.Sprite(gx.src["pj_"+pj.texture].texture);
@@ -179,7 +191,7 @@ engine.world_add_player = d => {
       xp: pj.status.$xp,
     };
     interface.player_status.name = config.USER.name;
-    interface.player_status.img = mx.BImg(config.PATH.img_pjs+"/" + pj.texture);
+    interface.player_status.img = mx.BImg(config.PATH.img_pjs+"/" + pj.texture + "/" + pj.texture + "_profile");
   }
 }
 

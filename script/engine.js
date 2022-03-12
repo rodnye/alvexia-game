@@ -10,9 +10,9 @@ gx = {
   get src(){return game.loader.resources},
   
   /* atributos editables */
-  _paint_offset: 100, //espacio de dibujado fuera de la pantalla
-  _tile_size: 50, //tamaño de cuadrícula
-  _screen_reference: 620, //ancho de pantalla de referencia para escala
+  _paint_offset: 200, //espacio de dibujado fuera de la pantalla
+  _tile_size: 100, //tamaño de cuadrícula
+  _screen_reference: 620*2, //ancho de pantalla de referencia para escala
   _emitps: 5,  //emit por segundo
   _engine_fps: 30,  //cuadros por segundo
   _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
@@ -25,9 +25,9 @@ gx = {
 
 
 // INICIALIZAR JUEGO //
-engine.init = ()=> {
+engine.init = function(){
   let callback = ()=>{};
-  cvw = n => screen.width * (n * 100 / gx._screen_reference) / 100;
+  cvw = function (n){return screen.width * (n * 100 / gx._screen_reference) / 100};
   gx._paint_offset = cvw(gx._paint_offset);
   
   // PLAYER //
@@ -52,8 +52,16 @@ engine.init = ()=> {
       get $mp(){return gx.player.status.mp / gx.player.status.mp_max * 100},
       get $xp(){return gx.player.status.xp / gx.player.status.xp_max * 100}
     },
-    deg: 0,
+    get deg(){
+      let deg = Math.atan2(gx.player.mov.y, gx.player.mov.x) * (180/Math.PI);
+      return -deg<0? 360-deg: -deg
+    },
     texture: null,
+    mov_sprite: {
+      texture: 0,
+      time: 1,
+      x: 0
+    },
     
     _emit_joy_enable: false,
   };
@@ -70,14 +78,13 @@ engine.init = ()=> {
   engine.load_textures().ready(()=>{
     gx.player.sprite = new PIXI.Sprite(gx.src["pj_hero_male_1"].texture);
     gx.world.sprite = new PIXI.TilingSprite(gx.src["w_floor"].texture);
-    
-    engine.animation()
+   
     callback();
   });
   return {ready: n=>{callback = n}}
 }
 
-engine.animation = ()=>{
+engine.animation = function(){
   var world = gx.world;
   var player = gx.player;
   
@@ -116,10 +123,16 @@ engine.animation = ()=>{
       
       for(let i in gx.obj_colision){
         let obj = gx.obj_colision[i];
-        let colision = engine.colision(_player, obj);
+        let colision = engine.collision(_player, obj);
         if(obj.type === 0 ){
-            if(colision.x || (colision.t && gx._colision_axis)) p_cx = player.pos.x;
-          if(colision.y || (colision.t && gx._colision_axis)) p_cy = player.pos.y;
+          if(colision.x || (colision.t && gx._colision_axis)) {
+            p_cx = player.pos.x;
+            //console.log("colision x:")
+          }
+          if(colision.y || (colision.t && gx._colision_axis)) {
+            p_cy = player.pos.y;
+            //console.log("colision y:")
+          }
         }
       }
      }
@@ -134,7 +147,7 @@ engine.animation = ()=>{
   });
   
   // EMITIR AL SERVIDOR //
-  const emit = mx.Animate(gx._emitps, ()=>{
+  const emit = mx.Animate(gx._emitps, function(){
     if(player._emit_joy_enable){
         let emit_data = 
           player.pos.x.toFixed(2)+"&" + 
@@ -153,7 +166,7 @@ engine.animation = ()=>{
 }
 
 // ACCIONES JOYSTICK //
-engine.joystick = d => {
+engine.joystick = function(d){
     var player = gx.player;
     player._emit_joy_enable = d.x!=0 && d.y!=0;
     player.mov.x = d.x/100 * player.speed;
@@ -161,7 +174,7 @@ engine.joystick = d => {
 }
 
 // CARGAR DATOS LOCALES DEL MUNDO //
-engine.load_textures = () => {
+engine.load_textures = function(){
   let callback = ()=>{};
   
   const world = gx.world;
@@ -172,23 +185,27 @@ engine.load_textures = () => {
   const cache = new engine.cache();
   cache.add("w_floor", mx.BImg(path_world+"/base"));
   for (let i = 1; i <= 1; i++) cache.add("w_tree_"+i, mx.BImg(path_world+"/tree_"+i));
-  for (let i = 1; i <= 1; i++) cache.add("pj_hero_male_"+i, mx.BImg(path_pj+"/hero_male_"+i));
+  for (let i = 1; i <= 1; i++) {
+    let _path = path_pj+"/hero_male_"+i;
+    cache.add("pj_hero_male_"+i, mx.BImg(_path+"/hero_male_"+i));
+    for (let o = 1; o <= 3; o++) cache.add("pj_hero_male_"+i+"_m"+o, mx.BImg(_path+"/hero_male_"+i+"_m"+o));
+  }
   cache.save(() => callback());
   
   return {ready: n=>{callback=n}}
 };
 
 // COLISION //
-engine.colision = (oo1, oo2) => {
+engine.collision = function(oo1, oo2){
   let res = {x:false , y:false};
   
   let o1 = {
-    pos: oo1.coll_min!==undefined? oo1.coll_min : oo1.pos,
-    size: oo1.coll_max!==undefined? oo1.coll_max : oo1.size,
+    pos: oo1.coll_min !== undefined? oo1.coll_min : oo1.pos,
+    size: oo1.coll_max!== undefined? oo1.coll_max : oo1.size,
   }
   let o2 = {
-    pos: oo2.coll_min!==undefined? oo2.coll_min : oo2.pos,
-    size: oo2.coll_max!==undefined? oo2.coll_max : oo2.size,
+    pos: oo2.coll_min !== undefined? oo2.coll_min : oo2.pos,
+    size: oo2.coll_max!== undefined? oo2.coll_max : oo2.size,
   }
   
   if(
@@ -197,8 +214,12 @@ engine.colision = (oo1, oo2) => {
      o1.pos.y + o1.size.y >= o2.pos.y && //arriba o1
      o1.pos.y <= o2.pos.y + o2.size.y  //abajo o1
   ) {
-     if(m(o1.pos.x - o2.pos.x) >= m(o1.pos.y - o2.pos.y)) res.x = true;
-     else res.y = true;
+     if(m(o1.pos.x - o2.pos.x) > m(o1.pos.y - o2.pos.y)) res.x = true;
+     else if(m(o1.pos.x - o2.pos.x) < m(o1.pos.y - o2.pos.y)) res.y = true;
+     else {
+       res.x = true;
+       res.y = true;
+     };
   }
   
   res.t = res.x || res.y;
@@ -208,7 +229,7 @@ engine.colision = (oo1, oo2) => {
 }
 
 // PINTAR FRAME //
-engine.generate_frame =  () => {
+engine.generate_frame =  function(){
   if(config.TEST_ENABLE) fps_count.tickStart();
   let player = gx.player;
   let world = gx.world;
@@ -228,6 +249,23 @@ engine.generate_frame =  () => {
     game.stage.addChild(player.sprite);
     player.incanvas = true;
   }
+    //animación movimiento
+    if(player.mov.x || player.mov.y) {
+      player.mov_sprite.time++;
+      if(!(player.mov_sprite.time%6)) player.mov_sprite.texture++;
+      if(player.mov_sprite.texture > 3) player.mov_sprite.texture = 0;
+      if(player.deg>90 && player.deg<=270) {
+        player.sprite.scale.x = -1;
+        player.mov_sprite.x = cvw(player.size.x);
+      } else {
+        player.sprite.scale.x = 1;
+        player.mov_sprite.x = 0;
+      }
+    } else player.mov_sprite.texture = 0;
+    
+    if(player.mov_sprite.texture) player.sprite.texture = gx.src["pj_"+player.texture+"_m"+player.mov_sprite.texture].texture;
+    else player.sprite.texture = gx.src["pj_"+player.texture].texture;
+  
   player.sprite.width = cvw(player.size.x);
   player.sprite.height = cvw(player.size.y);
   
@@ -258,7 +296,7 @@ engine.generate_frame =  () => {
     } else pY = game_view.height/2;
     
   // UBICAR MUNDO Y JUGADOR //
-  player.sprite.x = pX - cvw(player.size.x)/2;
+  player.sprite.x = pX + player.mov_sprite.x - cvw(player.size.x)/2;
   player.sprite.y = pY - cvw(player.size.y)/2;
   player.sprite.zIndex = player.pos.z+1;
   world.sprite.tilePosition.x = mx;
@@ -359,7 +397,7 @@ engine.generate_frame =  () => {
   if(config.TEST_ENABLE) {
     engine.debug(
       "player=> x:" + player.pos.x + "/y:" + player.pos.y + "/z:"+player.pos.z.toFixed(2)+"\n"+
-      "mov=> x:" + player.mov.x.toFixed(2) + "/y:" + player.mov.y.toFixed(2) + "\n"+
+      "mov=> x:" + player.mov.x.toFixed(2) + "/y:" + player.mov.y.toFixed(2) + "/a: "+player.deg.toFixed(2) + "\n"+
       "emits enviados: " + total_emit + " ("+gx._emitps+"emit/s)"+"\n"+
       "bytes enviados: " + Number(bytes_s/1024).toFixed(2)+"KB\n"+
       "bytes recibidos: " + Number(bytes_r/1024).toFixed(2)+"KB"+"\n"+
@@ -385,11 +423,11 @@ engine.cache = class {
 }
 
 // CONVERSOR DE TILES //
-engine.tile = n=> n * gx._tile_size;
-engine.atile = n=> Math.floor(n / gx._tile_size);
+engine.tile = function(n){return n * gx._tile_size};
+engine.atile = function(n){Math.floor(n / gx._tile_size)};
 
 // DIRECCION //
-engine.direction = (x, y) => {
+engine.direction = function(x, y){
   let rad = Math.atan2(y,x);
   let deg = rad * (180/Math.PI);
   /*
@@ -404,7 +442,7 @@ engine.direction = (x, y) => {
 
 
 // DEBUG CANVAS //
-engine.debug = async txt => {
+engine.debug = async function(txt){
   if(!gx.txt_debug) {
     gx.txt_debug = new PIXI.Text("", {
       fontSize: 10

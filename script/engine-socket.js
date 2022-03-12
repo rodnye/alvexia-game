@@ -46,6 +46,8 @@ engine.socket = (socket)=> {
     
     //cargar objetos en memoria
     for( let i in d.objects) engine.world_add_obj(d.objects[i], i);
+    
+    engine.animation()
   });
 
   // AGREGAR NUEVO PLAYER EN LA CAMARA //
@@ -208,4 +210,19 @@ engine.world_add_obj = (d, pos)=>{
   obj.sprite.width = cvw(obj.size.x);
   obj.sprite.height = cvw(obj.size.y);
   obj.sprite.zIndex = obj.pos.z;
+  
+  //puntos de colision//
+  switch(obj.name) {
+    // ARBOL 1 //
+    case "tree_1": 
+      obj.coll_min = {
+        x: obj.pos.x,
+        y: obj.pos.y + engine.tile(1)
+      };
+      obj.coll_max = {
+        x: engine.tile(1),
+        y: engine.tile(1)
+      }
+    break;
+  }
 }

@@ -4,9 +4,9 @@ delay_emit_count = 0;
 bytes_s = 0;
 bytes_r = 0;
 
-engine.socket = (socket)=> {
+engine.socket = socket => {
 
-  // LOAD MAP //
+  // cargar terreno
   socket.on("load_map", d => {
     console.log("ws load_map");
     bytes_r += JSON.stringify(d).length;
@@ -39,7 +39,6 @@ engine.socket = (socket)=> {
     world.pos.x = d.pos.x;
     world.pos.y = d.pos.y;
     world.biome = d.biome;
-    //console.log(d)
     
     //cargar jugadores en el area
     for(let i in d.pjs) engine.world_add_player({username:i, pjstats:d.pjs[i]});
@@ -47,11 +46,11 @@ engine.socket = (socket)=> {
     //cargar objetos en memoria
     for( let i in d.objects) engine.world_add_obj(d.objects[i], i);
     
-    if(!gx._animation) gx._animation = engine.animation();
+    if(!gx._animation) gx._animation = engine.loop();
     gx._animation.start();
   });
 
-  // AGREGAR NUEVO PLAYER EN LA CAMARA //
+  // añadir jugador
   socket.on("new_pj", d=> {
     bytes_r += JSON.stringify(d).replace(/\"/g, "").length;
     /*username,
@@ -75,21 +74,21 @@ engine.socket = (socket)=> {
     engine.world_add_player(d);
   });
 
-  // ACTUALIZAR PLAYER EN LA CAMARA //
+  // eliminar jugadores
   socket.on("del_pj", d=> {
     bytes_r += JSON.stringify(d).length;
     console.info("player removed >> "+d)
     if(gx.pjs[d]) gx.pjs[d].delete = true;
   });
 
-  // MOVER //
-  socket.on("move_pj", d=> {
+  // mover jugadores
+  socket.on("move_pj", function(d) {
     bytes_r += JSON.stringify(d).length;
     /* formato de datos
-       0 => username
-       1 => posx
-       2 => posy
-       3 => angle
+       @params 0 String(username)
+       @params 1 String(posx)
+       @params 2 String(posy)
+       @params 3 String(angle)
     */
     d = d.split("&");
     let name = d[0];
@@ -99,7 +98,7 @@ engine.socket = (socket)=> {
     let is_user = config.USER.name == name;
     let pj = is_user? gx.player : gx.pjs[name];
     
-    //suavisado
+    //suavisado de movimiento
     if(pj.smooth) {
       pj.smooth.stop();
       delete pj.smooth;
@@ -124,13 +123,21 @@ engine.socket = (socket)=> {
     
     pj.deg = a;
     if (is_user) {
+      //ubicar mundo
       gx.world.pos.x = -x;
       gx.world.pos.y = -y;
     }
   })
+  
+  // chat
+  socket.on("load_chat", function(d){
+    console.log("ws load_chat")
+    console.log(d)
+  })
 
 }
 
+//añadir jugador
 engine.world_add_player = d => {
   console.info("player "+d.username+" added");
   let stats = d.pjstats;
@@ -195,6 +202,7 @@ engine.world_add_player = d => {
   }
 }
 
+//añadir objeto
 engine.world_add_obj = (d, pos)=>{
   console.log("obj "+d.name+" added "+pos)
   if(gx.obj[pos]){

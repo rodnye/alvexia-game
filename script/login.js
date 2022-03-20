@@ -20,6 +20,13 @@ function OnStart() {
   reg_input_pass = dom.get("#register-input-pass");
   reg_input_rpass = dom.get("#register-input-rpass");
   reg_submit = dom.get("#register-submit");
+  
+  //elementos adicionales
+  btn_emulator = dom.get("#btn-open-emulator");
+        btn_emulator.onclick = function(){
+          app.SetData("emulator", JSON.stringify({value:true}));
+          mx.open("view-game.html");
+        }
 
   TAB.login.init();
   TAB.register.init();
@@ -131,6 +138,7 @@ TAB.login.submit = ({
         if (_data.status) {
           var auth_query = "token="+_data.data+"&username="+_user;
           app.SetData("auth-query", auth_query);
+          app.SetData("emulator", JSON.stringify({value:false}));
           mx.SaveText("login-user", _user);
           mx.SaveText("login-pass", _pass);
           mx.open("./view-game.html");

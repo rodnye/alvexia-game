@@ -7,12 +7,13 @@
     <script src='file:///android_asset/app.js'></script>
     <script src='./Html/pixi.min.js'></script>
     <!--source-->
-    <link rel="stylesheet" href="file:///android_asset/edit/font-awesome/css/all.min.css"></link>
+    <link rel="stylesheet" href="file:///android_asset/edit/font-awesome/css/font-awesome.min.css"></link>
     <link rel="stylesheet" href="./style/global.css"></link>
     <script src="config.js"></script>
     
     <script src="./script/game.js"></script>
     <link rel='stylesheet' href='./style/game.css'></link>
+    <link rel='stylesheet' href='./style/game-chat.css'></link>
 </head>
 
 <body onload="app.Start()">
@@ -46,6 +47,7 @@
 	  Minimapa
 	</div>
 	
+	<!-- Botones -->
 	<div id=action-container>
 	   <div class=action-container-top>
 	     <div class=column-action-container>
@@ -68,5 +70,19 @@
 	     </div>
 	   </div>
 	</div>
+	
+	<!-- Chat Slide -->
+	<nav id=drawer-lay-chat>
+	  <i class="fa fa-comment fa-lg" id="drawer-btn-chat"></i>
+	  
+	  <div id=cont-lay-chat>
+	    <!-- view chat -->
+	    <div id=cont-view-chat></div>
+	    
+	    <!-- pestañas -->
+	    <div id=cont-btn-view-chat></div>
+	  </div>
+	</nav>
+	
 </body>
 </html>

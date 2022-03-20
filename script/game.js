@@ -1,9 +1,11 @@
+Emulator = {};
 engine = {};
 gx = {};
 interface = {};
 
 
 app.Script(config.PATH.lib+"/socket-io.min.js");
+app.Script(config.PATH.script+"/emulator-socket.js");
 app.Script(config.PATH.lib+"/joy.min.js");
 app.Script(config.PATH.lib+"/fpsmeter.min.js");
 app.Script(config.PATH.script+"/global.js");
@@ -22,7 +24,7 @@ function OnStart() {
     name: mx.LoadText("login-user"),
     pass: mx.LoadText("login-pass"),
     is_connect: false,
-    socket_enabled: false,
+    socket_enabled: JSON.parse(app.GetData("emulator")).value
   }
   
   
@@ -58,7 +60,10 @@ function OnStart() {
 // CONEXION //
 function Connect() {
   mx.ShowProgress();
-  config.USER.socket_enabled = true;
+  if(config.USER.socket_enabled) {
+    Emulator._init();
+    io = new Emulator.Client();
+  }
   socket = io.connect(config.URL.socket, config.USER.socket);
 
   socket.on("connect", ()=>{

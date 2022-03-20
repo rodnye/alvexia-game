@@ -1,0 +1,78 @@
+/* Chat Drawer */
+#drawer-lay-chat {
+  position: fixed;
+  left: 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  
+}
+#drawer-lay-chat i {
+  color: white;
+}
+#drawer-btn-chat {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px 10px 0 0;
+  padding: 5px 10px;
+}
+#cont-lay-chat {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 40vw;
+  height: 40vh;
+  border-radius: 5px 5px 0 0;
+  align-items: stretch;
+}
+#cont-view-chat {
+  flex-grow: 1;
+  display: flex;
+  align-items: stretch;
+  background: rgba(0,0,0,0.2);
+}
+  /* secciones */
+  div.view-chat {
+    display: none;
+    flex-grow: 1;
+  };
+  
+  /* pestañas */
+  #cont-btn-view-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  div.btn-view-chat {
+    background: rgba(0,0,0,0.5);
+    border-radius: 0 10px 10px 0;
+    padding: 6px;
+  }
+
+/* Chat */
+div.bubble-chat {
+  border-radius: 100px;
+  max-width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: red;
+}
+
+div.cont-bubble-chat-my {
+  display: flex;
+  justify-content: flex-end;
+}
+div.cont-bubble-chat-my > div.bubble-chat {
+  
+}
+
+div.cont-bubble-chat-pj {
+  display: flex;
+  justify-content: flex-start;
+}
+div.cont-bubble-chat-my > div.bubble-chat {
+  
+}

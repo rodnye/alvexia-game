@@ -27,6 +27,8 @@
   width: 150px;
   height: 150px;
   margin-bottom:0;
+  
+  z-index: 3;
 }
 
 #action-container {

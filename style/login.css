@@ -7,6 +7,13 @@ body {
 	top: 0;
 }
 
+/* Estilos boton emulador */
+#btn-open-emulator {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+
 /* Estilos del TAB */
 div.container {
     background: var(--color-background-box);

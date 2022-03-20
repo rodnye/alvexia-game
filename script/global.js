@@ -8,9 +8,16 @@ mx = {};
 mx.ShowProgress = txt => app.ShowProgress(txt);
 mx.HideProgress = txt => app.HideProgress(txt);
 mx.open = url => location.href = url;
-mx.Alert = txt=>app.Alert(txt);
-mx.debug_init = ()=>config.TEST_ENABLE?new Debugger("console").enable():0;
-mx.reload = ()=>app.Execute("ext.reloadUrl()");
+mx.Alert = txt=> app.Alert(txt);
+mx.debug_init = ()=> {
+  if(config.TEST_ENABLE) {
+    let dfg = new Debugger("console");
+    dfg.__container.style.zIndex = 5;
+    dfg.enable();
+    return dfg;
+  }
+}
+mx.reload = ()=> app.Execute("ext.reloadUrl()");
 
 //evitar interacciones del usuario
 mx.CreateBlock = function(){
@@ -92,8 +99,8 @@ mx.round = function(num) {
     return Math.round(m) / 100 * Math.sign(num);
 }
 
-dg = n=>{console.log(n);return n};
-cvw = n=>screen.width*(n*100/720)/100;
+dg = function(n){console.log(n);return n};
+cvw = function(n){return screen.width*(n*100/720)/100};
 
 //parseador de status del server
 var raw;

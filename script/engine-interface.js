@@ -1,3 +1,4 @@
+// estado del jugador
 interface.player_status = {
   set img(url) {
     let img = dom.get("div.profile-status-box > img");
@@ -24,17 +25,64 @@ interface.player_status = {
   },
 };
 
+// chat ingame
+interface.chat = class {
+  
+  constructor(el){
+    this.container = el;
+  }
+  
+  send(txt){
+    const cont = dom.create("div");
+    const bubble = dom.create("div");
+    const text = dom.create("div");
+    
+    cont.dom.set("class", "cont-bubble-chay-my");
+    bubble.dom.set("class", "bubble-chat");
+    text.innerText = txt;
+    
+    bubble.dom.add(text);
+    cont.dom.add(bubble);
+    this.container.dom.add(cont);
+    this.scroll();
+  }
+  
+  receive(txt, nick){
+    const cont = dom.create("div");
+    const bubble = dom.create("div");
+    const name = dom.create("h4");
+    const text = dom.create("div");
+    
+    cont.dom.set("class", "cont-bubble-chay-pj");
+    bubble.dom.set("class", "bubble-chat");
+    name.innerText = nick;
+    text.innerText = txt;
+    
+    bubble.dom.add([name,text]);
+    cont.dom.add(bubble);
+    this.container.dom.add(cont);
+    this.scroll();
+  }
+  
+  scroll(){
+    this.container.scrollTop = this.container.scrollHeight;
+  }
+};
+
+
+//minimapa
 interface.map = {
   reload: () => {},
 }
 
+//burbuja de testeo
 interface.debug = class {
   constructor(){
     let btn_float = dom.create("div");
     let container = dom.create("div");
     let float_box = dom.create("div");
     let icon = dom.create("i");
-        icon.dom.set("class","fa fa-edit");
+        icon.dom.set("class","fa fa-cubes");
         icon.style.color = "white";
         
     let visible = false;

@@ -13,9 +13,10 @@ engine.collision = function(oo1, oo2){
   
   if(
      o1.pos.x + o1.size.x >= o2.pos.x && //derecha o1
-     o1.pos.x <= o2.pos.x + o2.size.x &&   //izquierda o1
+     o1.pos.x <= o2.pos.x + o2.size.x && //izquierda o1
      o1.pos.y + o1.size.y >= o2.pos.y && //arriba o1
-     o1.pos.y <= o2.pos.y + o2.size.y  //abajo o1
+     o1.pos.y <= o2.pos.y + o2.size.y && //abajo o1
+     (oo2.ds === undefined || oo2.ds !== 0)
   ) {
      if(m(o1.pos.x - o2.pos.x) > m(o1.pos.y - o2.pos.y)) res.x = true;
      else if(m(o1.pos.x - o2.pos.x) < m(o1.pos.y - o2.pos.y)) res.y = true;

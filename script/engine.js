@@ -23,7 +23,6 @@ gx = {
   _screen_reference: 620*2, //ancho de pantalla de referencia para escala
   _emitps: 5,  //emit por segundo
   _engine_fps: 30,  //cuadros por segundo
-  _smooth_mov_fps: 60, //velocidad de suavizado de movimiento
   _smooth_mov_steps: 30, //cantidad de pasos en el suavisado
 
   _colision_enable: true,
@@ -93,18 +92,11 @@ engine.init = function () {
 
 
 // joystick
-var _interval = true;
 engine.joystick = function(d){
-  if(_interval) {
-    window.setTimeout(()=>{
-      var player = gx.player;
-      player._emit_joy_enable = d.x!=0 && d.y!=0;
-      player.mov.x = d.x/100 * player.speed;
-      player.mov.y = -d.y/100 * player.speed;
-      let deg = Math.atan2(gx.player.mov.y, gx.player.mov.x) * (180/Math.PI);
-      player.deg = -deg<0? 360-deg: -deg;
-      _interval = true;
-    }, 190); //suavisado del joystick
-    _interval = false;
-  }
+    var player = gx.player;
+    player._emit_joy_enable = d.x!=0 && d.y!=0;
+    player.mov.x = d.x/100 * player.speed;
+    player.mov.y = -d.y/100 * player.speed;
+    let deg = Math.atan2(gx.player.mov.y, gx.player.mov.x) * (180/Math.PI);
+    player.deg = -deg<0? 360-deg: -deg;
 }

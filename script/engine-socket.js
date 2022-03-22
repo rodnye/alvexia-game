@@ -24,10 +24,10 @@ engine.socket = socket => {
         terrain : {},
         objects : {
           "x_y": {
-            name: 
-            type:
-            amount: 
-            c_amount:
+            t: textura
+            d: 0 traspasable 
+               1 destructiblr
+               2 no traspasable
           }
         },
         npcs : {},
@@ -67,7 +67,7 @@ engine.socket = socket => {
         }
         skin,
         pos: {x,y,angle}
-        size: {x,y}
+        size: "x_y"
       }
     };
     */
@@ -108,18 +108,20 @@ engine.socket = socket => {
     pj.mov.x = deltaX / gx._smooth_mov_steps;
     pj.mov.y = deltaY / gx._smooth_mov_steps;
     
-    let i = 0;
-    pj.smooth = mx.Animate(gx._smooth_mov_fps, ()=>{
-      pj.pos.x += pj.mov.x;
-      pj.pos.y += pj.mov.y;
-      if(i >= gx._smooth_mov_steps) {
-        pj.mov.x = 0;
-        pj.mov.y = 0;
-        return pj.smooth.stop();
-      }
-      i++
-    });
+    const pos = {
+      x: pj.pos.x,
+      y: pj.pos.y
+    }
+    pj.smooth = dom.animate(function(time){
+      pj.pos.x = pos.x + pj.mov.x * gx._smooth_mov_steps * time;
+      pj.pos.y = pos.y + pj.mov.y * gx._smooth_mov_steps * time;
+    }, 500);
+    
     pj.smooth.start();
+    pj.smooth.finish(function(){
+      pj.mov.x = 0;
+      pj.mov.y = 0;
+    })
     
     pj.deg = a;
     if (is_user) {
@@ -204,45 +206,83 @@ engine.world_add_player = d => {
 
 //añadir objeto
 engine.world_add_obj = (d, pos)=>{
-  console.log("obj "+d.name+" added "+pos)
+  console.log("obj "+d.t+" added "+pos)
   if(gx.obj[pos]){
     game.stage.removeChild(gx.obj[pos].sprite);
     gx.obj[pos].sprite.destroy();
   }
   
-  gx.obj[pos] = d;
+  gx.obj[pos] = {
+    name: d.t,
+    ds: d.d
+  };
   const obj = gx.obj[pos];
-  let size = obj.size.split("_");
-      pos = pos.split("_");
-  
-  
-  obj.size = {
-    x: engine.tile(size[0]-0),
-    y: engine.tile(size[1]-0)
+  pos = pos.split("_");
+  pos = {
+    x: pos[0]-0,
+    y: pos[1]-0
   };
-  obj.pos = {
-    x: engine.tile(pos[0]-0), 
-    y: engine.tile(pos[1] - size[1] +1),
-    get z(){return (obj.pos.y + obj.size.y) / gx.world.size.y}
-  };
+  let size = {
+    x: 1,
+    y: 1
+  }
+  
+  // opciones por defecto //
+  switch(obj.name) {
+    
+    // ARBOL 1 //
+    case "tree_1": 
+      size.y = 2;
+      set_pos();
+      obj.coll_min = {
+        x: engine.tile(pos.x),
+        y: engine.tile(pos.y + 1)
+      };
+      obj.coll_max = {
+        x: engine.tile(1),
+        y: engine.tile(1)
+      };
+      obj.ds = 3;
+    break;
+    
+    // CÉSPED //
+    case "lawn":
+      size.y = 1.2;
+      size.x = 1.2;
+      set_pos();
+      obj.ds = 0;
+    break;
+    
+    default:
+    
+    // FLORES //
+    if(/flw_[0-9]/.test(obj.name)) {
+      size.y = 0.5;
+      size.x = 0.5;
+      set_pos("center");
+      obj.ds = 0;
+    }
+  }
+  
+  function set_pos(type){
+    obj.pos = {
+      x: engine.tile(type!="center"?pos.x:pos.x+0.5-size.x/2), 
+      y: engine.tile(type!="center"?pos.y:pos.y+0.5-size.y/2), 
+      get z(){return (obj.pos.y + obj.size.y) / gx.world.size.y}
+    }
+    obj.size = {
+      x: engine.tile(size.x),
+      y: engine.tile(size.y)
+    }
+    if(d.pz!==undefined) {
+      delete obj.pos.z;
+      obj.pos.z = d.pz;
+    }
+  }
   
   obj.sprite = new PIXI.Sprite(gx.src["w_"+obj.name].texture);
   obj.sprite.width = cvw(obj.size.x);
   obj.sprite.height = cvw(obj.size.y);
   obj.sprite.zIndex = obj.pos.z;
   
-  //puntos de colision//
-  switch(obj.name) {
-    // ARBOL 1 //
-    case "tree_1": 
-      obj.coll_min = {
-        x: obj.pos.x,
-        y: obj.pos.y + engine.tile(1)
-      };
-      obj.coll_max = {
-        x: engine.tile(1),
-        y: engine.tile(1)
-      }
-    break;
-  }
 }

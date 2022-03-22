@@ -133,11 +133,11 @@ function ActivateTest(){
   })
   
   // LOGIN //
-  dev.add_button("Ir a login", ()=>mx.open("view-login.html"))
+  dev.add_button("Ir a login", ()=> mx.open("view-login.html"))
   
   // RECONECTAR //
-  dev.add_button("Reconectar", ()=>app.Execute("ext.reload_url()"))
+  dev.add_button("Reconectar", ()=> app.Execute("ext.reload_url()"))
   
   // SALIR //
-  dev.add_button("Exit App", ()=>app.Exit(true));
+  dev.add_button("Exit App", ()=> app.Exit(true));
 }

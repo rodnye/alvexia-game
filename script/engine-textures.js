@@ -9,7 +9,9 @@ engine.load_textures = function(){
   // CARGAR TEXTURAS EN LA CACHÉ //
   const cache = new engine.cache();
   cache.add("w_floor", mx.BImg(path_world+"/base"));
+  cache.add("w_lawn", mx.BImg(path_world+"/lawn"));
   for (let i = 1; i <= 1; i++) cache.add("w_tree_"+i, mx.BImg(path_world+"/tree_"+i));
+  for (let i = 1; i <= 3; i++) cache.add("w_flw_"+i, mx.BImg(path_world+"/flw_"+i));
   for (let i = 1; i <= 1; i++) {
     let _path = path_pj+"/hero_male_"+i;
     cache.add("pj_hero_male_"+i, mx.BImg(_path+"/hero_male_"+i));

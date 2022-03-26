@@ -1,11 +1,11 @@
 //motor del juego
-app.Script(config.PATH.script + "/engine-frame.js");
-app.Script(config.PATH.script + "/engine-physics.js");
-app.Script(config.PATH.script + "/engine-textures.js");
-app.Script(config.PATH.script + "/engine-loop.js");
-app.Script(config.PATH.script + "/engine-interface.js");
-app.Script(config.PATH.script + "/engine-chat.js");
-app.Script(config.PATH.script + "/engine-socket.js");
+app.Script(config.PATH.script + "/engine/frame.js");
+app.Script(config.PATH.script + "/engine/physics.js");
+app.Script(config.PATH.script + "/engine/textures.js");
+app.Script(config.PATH.script + "/engine/loop.js");
+app.Script(config.PATH.script + "/engine/interface.js");
+app.Script(config.PATH.script + "/engine/chat.js");
+app.Script(config.PATH.script + "/engine/socket.js");
 
 //elementos del juego
 gx = {

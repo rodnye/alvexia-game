@@ -1,4 +1,5 @@
 //importación de librerías
+app.Script = _LoadScriptSync;
 app.Script(config.PATH.lib+"/dom.min.js");
 app.Script(config.PATH.lib+"/debug-zone.min.js");
 

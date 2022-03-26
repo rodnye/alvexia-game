@@ -1,3 +1,5 @@
+cfg.Fast;
+
 const ext = {};
 function OnStart(){
    //configuraciones

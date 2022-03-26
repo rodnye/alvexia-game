@@ -1,5 +1,5 @@
 //Servidor Socket emulado
-app.Script(config.PATH.script+"/emulator.js")
+app.Script(config.PATH.script+"/emulator/emulator.js")
 
 const pjs = {};
 const obc = {}

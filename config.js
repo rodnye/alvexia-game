@@ -16,11 +16,11 @@ config = {
         img_pjs: "{{PATH.img}}"+"/pjs",
         img_world: "{{PATH.img}}"+"/world",
         sound: "./Snd",
-        lib: "./Html",
-        script: "./script",
+        lib: "./Html/lib",
+        script: "./Html/script",
         data: "/sdcard/Android/data/"+"{{PACKAGE}}",
       },
-      TEST_ENABLE: true//app.InIDE(),
+      TEST_ENABLE: true,
 }
 
 //function parseadora de string {{ }}

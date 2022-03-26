@@ -3,15 +3,16 @@ engine = {};
 gx = {};
 interface = {};
 
-
+//cargar librerías
+app.Script(config.PATH.lib+"/pixi.min.js");
 app.Script(config.PATH.lib+"/socket-io.min.js");
-app.Script(config.PATH.script+"/emulator-socket.js");
 app.Script(config.PATH.lib+"/joy.min.js");
 app.Script(config.PATH.lib+"/fpsmeter.min.js");
-app.Script(config.PATH.script+"/global.js");
-app.Script(config.PATH.script+"/engine.js");
-app.Script(config.PATH.script+"/engine-socket.js");
-app.Script(config.PATH.script+"/engine-interface.js");
+
+//game
+app.Script(config.PATH.script+"/engine/engine.js");
+app.Script(config.PATH.script+"/engine/socket.js");
+app.Script(config.PATH.script+"/engine/interface.js");
 
 
 function OnStart() {
@@ -27,13 +28,15 @@ function OnStart() {
     socket_enabled: JSON.parse(app.GetData("emulator")).value
   }
   
+  //cargar motor de emulación
+  if(!config.socket_enabled) app.Script(config.PATH.script+"/emulator/socket.js");
   
   game_view = dom.get("#game-view");
   joy = new JoyStick("joystick", {}, engine.joystick);
   game_view.width = screen.width;
   game_view.height = screen.height;
   
-  // PIXI //
+  // inicializar pixi
   PIXI.utils.sayHello(PIXI.utils.isWebGLSupported()?"WebGL": "canvas");
   game = new PIXI.Application({
     width: screen.width,
